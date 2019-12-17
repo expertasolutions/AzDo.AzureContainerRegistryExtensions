@@ -92,7 +92,7 @@
     ],
     "execution": {
         "Node": {
-          "target": "src//acrcred.js",
+          "target": "acrcred.js",
           "argumentFormat": ""
         }
       }
