@@ -22,7 +22,7 @@
     "Toolsset",
     "Azure",
     "Kubernetes",
-    "ContainerRegistries",
+    "ContainerRegistries"
   ],
   "links":{
     "support": { 
