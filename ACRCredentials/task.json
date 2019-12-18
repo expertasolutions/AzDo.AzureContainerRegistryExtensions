@@ -1,10 +1,10 @@
 {
-  "id": "21f09e42-9d9e-4a0c-9499-87322487bb50",
+  "id": "14303c80-75c9-4c4b-8089-6f9fcd145cab",
     "name": "ACRCredential",
     "friendlyName": "ACR Credential",
     "description": "Show/Renew Azure Container registries password",
     "helpMarkDown": "",
-    "preview": false,
+    "preview": true,
     "category": "Utility",
     "author": "Solutions Experta Inc.",
     "version": {

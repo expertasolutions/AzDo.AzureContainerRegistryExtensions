@@ -1,10 +1,10 @@
 {
-  "id": "585c72b7-52df-4afc-be01-51a5ed7e5c78",
+  "id": "4ddb1c61-8163-46fc-b175-ebf11e0f870c",
     "name": "ACRAKSAccess",
     "friendlyName": "ACRAKS Access",
     "description": "Set ACR Access to Kubernetes cluster",
     "helpMarkDown": "",
-    "preview": false,
+    "preview": true,
     "category": "Utility",
     "author": "Solutions Experta Inc.",
     "version": {
