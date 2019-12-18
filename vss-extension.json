@@ -50,8 +50,8 @@
       "description":"master branch build"
     },
     {
-      "href": "https://dev.azure.com/experta/Community/_release?_a=releases&definitionId=x",
-      "uri": "https://vsrm.dev.azure.com/experta/_apis/public/Release/badge/97814487-b723-4a7d-a446-f599ab91ea2f/x/xx",
+      "href": "https://dev.azure.com/experta/Community/_release?_a=releases&view=mine&definitionId=10",
+      "uri": "https://vsrm.dev.azure.com/experta/_apis/public/Release/badge/97814487-b723-4a7d-a446-f599ab91ea2f/10/39",
       "description": "Public"
     }
   ],
