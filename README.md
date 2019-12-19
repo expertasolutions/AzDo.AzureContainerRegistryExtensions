@@ -19,8 +19,13 @@ Select the App registration related to your AzureDevOps **Azure Resource Manager
 
 # Tasks include
 
+**NOTE**: ***AdminUser*** must be enable on your Azure Container Registry to used this task.
+
 ## ACRCredentials
 ![ACRCredentials](_screenShots/ACRCredsInfo-v0.png)
+
+
+
 #### Action Type
 - Show: Get the current credentials information
 - Renew: Renew the current credentials information access
