@@ -15,12 +15,12 @@ Select the App registration related to your AzureDevOps **Azure Resource Manager
 
 **3)** Click on **Grant admin consent for [YOUR Azure AD Organization]** (ensure your are the Owner of the current app registration)
 
-![AzureADAppRegistrationApiPermissions](_screenShots/azureadapiperms.jpg)
+![AzureADRegistrationApiPermissions](_screenShots/azureadapiperms.jpg)
 
 # Tasks include
 
 ## ACRCredentials
-![ACRCredentials](_screenShots/acrCredential_v0-preview.png)
+![ACRCredentials](_screenShots/ACRCredsInfo-v0.png)
 #### Action Type
 - Show: Get the current credentials information
 - Renew: Renew the current credentials information access
@@ -30,4 +30,4 @@ Select the App registration related to your AzureDevOps **Azure Resource Manager
 - password2
 
 ## ACRAKSAccess
-![ACRAKSAccess](_screenShots/ACRAKSAccess_v0-preview.png)
+![ACRAKSAccess](_screenShots/ACRAKSAccess-v0.png)
