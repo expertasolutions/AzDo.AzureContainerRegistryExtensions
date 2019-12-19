@@ -56,7 +56,8 @@
   ],
   "files": [
       { "path": "ACRCredentials" },
-      { "path": "ACRAKSAccess" }
+      { "path": "ACRAKSAccess" },
+      { "path": "_screenShots", "addressable": true }
   ],
   "contributions": [
       {
