@@ -20,7 +20,7 @@ Select the App registration related to your AzureDevOps **Azure Resource Manager
 # Tasks include
 
 ## ACRCredentials
-![ACRCredentials](_screenShots/acrCredential_v1.png)
+![ACRCredentials](_screenShots/acrCredential_v0-preview.png)
 #### Action Type
 - Show: Get the current credentials information
 - Renew: Renew the current credentials information access
@@ -30,4 +30,4 @@ Select the App registration related to your AzureDevOps **Azure Resource Manager
 - password2
 
 ## ACRAKSAccess
-![ACRAKSAccess](_screenShots/ACRAKSAccess_v2.png)
+![ACRAKSAccess](_screenShots/ACRAKSAccess_v0-preview.png)
