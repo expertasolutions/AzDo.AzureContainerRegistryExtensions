@@ -26,7 +26,7 @@ steps:
   displayName: TypeScript Install
   inputs:
     command: 'custom'
-    workingDir: 'aRecordManager'
+    workingDir: 'ACRCredentials'
     customCommand: 'install -g typescript' 
 
 - task: Npm@1
