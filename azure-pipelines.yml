@@ -23,15 +23,23 @@ steps:
   displayName: 'Use Node CLI for Azure DevOps (tfx-cli): v0.6.x'
 
 - task: Npm@1
+  displayName: TypeScript Install
+  inputs:
+    command: 'custom'
+    workingDir: 'aRecordManager'
+    customCommand: 'install -g typescript' 
+
+- task: Npm@1
   displayName: 'npm install ACRAKSAccess'
   inputs:
     workingDir: ACRAKSAccess
     verbose: false
 
 - task: Npm@1
-  displayName: 'npm install ACRCredentials'
+  displayName: 'Build ACRCredentials'
   inputs:
     workingDir: ACRCredentials
+    customCommand: 'run publishExt'
     verbose: false
 
 - task: PackageAzureDevOpsExtension@2
