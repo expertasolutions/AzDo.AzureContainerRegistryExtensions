@@ -38,7 +38,7 @@ async function run() {
       tl.setResult(tl.TaskResult.Failed, "Container registry named " + containerRegistry + " does not have adminUser configured");
     } else {
       if(actionType === "show"){
-        let credsList = await manager.registries.listCredentials(resourceGroupName, containerRegistry);
+        let credsList:any = await manager.registries.listCredentials(resourceGroupName, containerRegistry);
         var pwd1 = credsList.passwords[0].value;
         var pwd2 = credsList.passwords[1].value;
         tl.setVariable("username", credsList.username, true);
@@ -48,18 +48,18 @@ async function run() {
         // Password 1
         var password = <msACR.ContainerRegistryManagementModels.RegenerateCredentialParameters>{ name: "password" };
         console.log("Regenerating password ...");
-        let genResult = await manager.registries.regenerateCredential(resourceGroupName, containerRegistry, password);
+        let genResult:any = await manager.registries.regenerateCredential(resourceGroupName, containerRegistry, password);
         tl.setVariable("username", genResult.username, true);
 
         // Password 2
         var password2 = <msACR.ContainerRegistryManagementModels.RegenerateCredentialParameters>{ name: "password2" };
         console.log("Regenerating password2 ...");
-        let genResult2 = await manager.registries.regenerateCredential(resourceGroupName, containerRegistry, password2)
+        let genResult2:any = await manager.registries.regenerateCredential(resourceGroupName, containerRegistry, password2)
         tl.setVariable("password2", genResult2.passwords[1].value, true);
       } else {
         let password = <msACR.ContainerRegistryManagementModels.RegenerateCredentialParameters>{ name: passwordToRenew };
         console.log("Regenerating " + passwordToRenew + " ...");
-        let genResult = await manager.registries.regenerateCredential(resourceGroupName, containerRegistry, password);
+        let genResult:any = await manager.registries.regenerateCredential(resourceGroupName, containerRegistry, password);
         var pwd1 = genResult.passwords[0].value;
         var pwd2 = genResult.passwords[1].value;
         tl.setVariable("username", genResult.username, true);
