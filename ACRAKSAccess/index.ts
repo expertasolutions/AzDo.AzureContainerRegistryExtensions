@@ -1,4 +1,5 @@
 import * as tl from 'azure-pipelines-task-lib';
+import * as msRest from '@azure/ms-rest-js';
 import * as msRestNodeAuth from '@azure/ms-rest-nodeauth';
 import * as resourceManagement from '@azure/arm-resources';
 import * as auth from '@azure/arm-authorization';
@@ -56,7 +57,7 @@ async function run() {
       console.log("ACR Password: " + acrPassword);
   }
 
-  const aksCreds = await LoginToAzure(aksServicePrincipalId, aksServicePrincipalKey, aksTenantId);
+  const aksCreds:any = await LoginToAzure(aksServicePrincipalId, aksServicePrincipalKey, aksTenantId);
   if(registerMode === "aksSecret") {
     console.log("AKS Secret Access mode");
     throw new Error("AKS Secret access mode not implemented yet");
@@ -71,21 +72,21 @@ async function run() {
     console.log("RBAC Access mode");
     console.log("Looking for Azure Kubernetes service cluster ...");
 
-    const aksResourceClient = new resourceManagement.ResourceManagementClient(aksCreds, aksSubcriptionId);
+    let aksResourceClient = new resourceManagement.ResourceManagementClient(aksCreds, aksSubcriptionId);
     let rsList = await aksResourceClient.resources.list();
-    const aksClusterInstance = rsList.find((element: any) => {
+    let aksClusterInstance:any = rsList.find((element: any) => {
       return element.name === aksCluster;
     });
 
     let aksInfoResult = await aksResourceClient.resources.getById(aksClusterInstance?.id, '2019-10-01');
     const clientId = aksInfoResult.properties.servicePrincipalProfile.clientId;
-    const aksAppCreds = new msRestNodeAuth.ApplicationTokenCredentials(aksCreds.clientId, aksTenantId, aksCreds.secret, 'graph');
-    const aksGraphClient = new graph.GraphRbacManagementClient(aksAppCreds, aksTenantId, { baseUri: 'https://graph.windows.net' });
+    let aksAppCreds:any = new msRestNodeAuth.ApplicationTokenCredentials(aksCreds.clientId, aksTenantId, aksCreds.secret, 'graph');
+    let aksGraphClient = new graph.GraphRbacManagementClient(aksAppCreds, aksTenantId, { baseUri: 'https://graph.windows.net' });
     let aksFilterValue = "appId eq '" + clientId + "'";
     let aksServiceFilter = { filter: aksFilterValue };
 
     let aksSearch = await aksGraphClient.servicePrincipals.list(aksServiceFilter);
-    const aksServicePrincipal = aksSearch.find((element : any) => {
+    let aksServicePrincipal:any = aksSearch.find((element : any) => {
       return element.appId === clientId;
     });
 
@@ -94,6 +95,49 @@ async function run() {
     }
 
     // Get the Azure Container Registry Resource infos
+    let acrCreds:any = await LoginToAzure(acrServicePrincipalId, acrServicePrincipalKey, acrTenantId);
+    let acrResourceClient = new resourceManagement.ResourceManagementClient(acrCreds, acrSubcriptionId);
+    let acrResult = await acrResourceClient.resources.list();
+    let acrInstance:any = acrResult.find((element:any)=> {
+      return element.name === containerRegistry;
+    });
+    
+    if(acrInstance === undefined){
+      throw new Error("Azure Container Registry instance not found");
+    }
+
+    let acrAuthClient = new auth.AuthorizationManagementClient(acrCreds, acrSubcriptionId);
+    const acrPullRoleName = "AcrPull";
+    let roles = await acrAuthClient.roleDefinitions.list("/");
+    let acrRole:any = roles.find((role:any)=> {
+      return role.roleName === acrPullRoleName;
+    });
+
+    if(acrRole === undefined){
+      throw new Error("AcrPull not found");
+    }
+
+    let rs = await acrAuthClient.roleAssignments.listForResourceGroup(acrResourceGroup);
+    let roleAssignment = rs.find((elm:any)=> {
+      const rolId = "/subscriptions/" + acrSubcriptionId + acrRole.id;
+      return rolId === elm.roleDefinitionId && elm.principalId === aksServicePrincipal?.objectId;
+    });
+
+    if(roleAssignment === undefined){
+      var newRoleParm = {
+        roleDefinitionId: acrRole.id,
+        principalId: aksServicePrincipal.objectId
+      };
+
+      console.log(newRoleParm);
+
+      let newRoleResult = await acrAuthClient.roleAssignments.create(acrInstance.id, aksServicePrincipal.objectId, newRoleParm);
+      if(newRoleResult != undefined){
+        console.log("New role assignement created!");
+      }
+    } else {
+      console.log("Role assignement already existing");
+    }
   }
 }
 
