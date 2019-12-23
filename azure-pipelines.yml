@@ -30,15 +30,17 @@ steps:
     customCommand: 'install -g typescript' 
 
 - task: Npm@1
-  displayName: 'npm install ACRAKSAccess'
+  displayName: 'Build ACRAKSAccess Task'
   inputs:
+    command: 'custom'
     workingDir: ACRAKSAccess
     customCommand: 'run publishExt'
     verbose: false
 
 - task: Npm@1
-  displayName: 'Build ACRCredentials'
+  displayName: 'Build ACRCredentials Task'
   inputs:
+    command: 'custom'
     workingDir: ACRCredentials
     customCommand: 'run publishExt'
     verbose: false
