@@ -7,7 +7,7 @@ pr:
 - master
 
 pool:
-  name: MacNetCorePools
+  vmImage: macOS-latest
   demands: npm
 workspace:
  clean: true
@@ -23,15 +23,26 @@ steps:
   displayName: 'Use Node CLI for Azure DevOps (tfx-cli): v0.6.x'
 
 - task: Npm@1
-  displayName: 'npm install ACRAKSAccess'
+  displayName: TypeScript Install
   inputs:
+    command: 'custom'
+    workingDir: 'ACRAKSAccess'
+    customCommand: 'install -g typescript' 
+
+- task: Npm@1
+  displayName: 'Build ACRAKSAccess Task'
+  inputs:
+    command: 'custom'
     workingDir: ACRAKSAccess
+    customCommand: 'run publishExt'
     verbose: false
 
 - task: Npm@1
-  displayName: 'npm install ACRCredentials'
+  displayName: 'Build ACRCredentials Task'
   inputs:
+    command: 'custom'
     workingDir: ACRCredentials
+    customCommand: 'run publishExt'
     verbose: false
 
 - task: PackageAzureDevOpsExtension@2
