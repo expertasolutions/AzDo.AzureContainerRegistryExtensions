@@ -153,7 +153,7 @@
     "outputVariables" : [],
     "execution": {
         "Node": {
-          "target": "acraksaccess.js",
+          "target": "index.js",
           "argumentFormat": ""
         }
       }
