@@ -8,7 +8,6 @@ pr:
 
 pool:
   name: MacNetCorePools
-  demands: npm
 workspace:
  clean: true
 
