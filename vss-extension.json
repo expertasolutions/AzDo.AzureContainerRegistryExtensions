@@ -26,7 +26,8 @@
   "links":{
     "support": { 
         "uri": "https://github.com/expertasolutions/AzureContainerRegistryExtensions/issues"
-    }
+    },
+    "privacypolicy": { "uri": "http://experta.ca/privacy/azuredevopsprivacy" } 
   },
   "repository": {
     "type" : "git",
