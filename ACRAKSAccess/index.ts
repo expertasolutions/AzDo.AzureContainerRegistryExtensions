@@ -5,7 +5,7 @@ import * as resourceManagement from '@azure/arm-resources';
 import * as auth from '@azure/arm-authorization';
 import * as graph from '@azure/graph';
 
-const clusterconnection_1 = require("./src/clusterconnection");
+const clusterconnection_1 = require("./clusterconnection");
 const environmentVariableMaximumSize = 32766;
 
 async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:string, tenantId:string) {
@@ -67,7 +67,7 @@ async function run() {
 
     const aksCreds:any = await LoginToAzure(aksServicePrincipalId, aksServicePrincipalKey, aksTenantId);
     if(registerMode === "aksSecret") {
-      const clusterconnection_1 = require("./src/clusterconnection");
+      const clusterconnection_1 = require("./clusterconnection");
 
       let command = "get";
       let kubeconfigfilePath:any = "";
