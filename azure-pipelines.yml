@@ -55,7 +55,7 @@ steps:
   displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)'
-    Contents: À
+    Contents: |
       *.vsix
       CurrentReleaseNotes.md
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
