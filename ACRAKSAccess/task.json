@@ -150,7 +150,9 @@
         "resultTemplate": "{{{name}}}"
       }
     ],
-    "outputVariables" : [],
+    "outputVariables" : [
+      { "name": "imagePullSecretName" }
+    ],
     "execution": {
         "Node": {
           "target": "index.js",

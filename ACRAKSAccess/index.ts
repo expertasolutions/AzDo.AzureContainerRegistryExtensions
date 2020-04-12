@@ -60,8 +60,11 @@ async function run() {
 
     const aksCreds:any = await LoginToAzure(aksServicePrincipalId, aksServicePrincipalKey, aksTenantId);
     if(registerMode === "aksSecret") {
-      console.log("AKS Secret Access mode");
-      throw new Error("AKS Secret access mode not implemented yet");
+      
+      tl.setVariable("imagePullSecretName", "patate", true);
+
+      //console.log("AKS Secret Access mode");
+      //throw new Error("AKS Secret access mode not implemented yet");
       /*
           Old Powershell code algo
           $acrInfo = az acr show --name $containerRegistry -g $acrResourceGroup --subscription $acrSubscriptionId | ConvertFrom-Json
@@ -69,6 +72,8 @@ async function run() {
               throw "Container registry named '$containerRegistry' does not have adminUser configured"
           }
       */
+     
+
     } else {
       console.log("RBAC Access mode");
       console.log("Looking for Azure Kubernetes service cluster ...");
