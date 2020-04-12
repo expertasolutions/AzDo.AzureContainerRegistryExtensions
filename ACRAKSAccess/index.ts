@@ -5,11 +5,14 @@ import * as resourceManagement from '@azure/arm-resources';
 import * as auth from '@azure/arm-authorization';
 import * as graph from '@azure/graph';
 
+const clusterconnection_1 = require("./src/clusterconnection");
+const environmentVariableMaximumSize = 32766;
+
 async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:string, tenantId:string) {
     return await msRestNodeAuth.loginWithServicePrincipalSecret(servicePrincipalId, servicePrincipalKey, tenantId );
 };
 
-async function runKubeCtlCommand(clusterConnection, command) {
+async function runKubeCtlCommand(clusterConnection:any, command:string) {
   return await executeKubectlCommand(clusterConnection, "get", "service ");
 };
 
@@ -65,15 +68,14 @@ async function run() {
     const aksCreds:any = await LoginToAzure(aksServicePrincipalId, aksServicePrincipalKey, aksTenantId);
     if(registerMode === "aksSecret") {
       const clusterconnection_1 = require("./src/clusterconnection");
-      const environmentVariableMaximumSize = 32766;
 
       let command = "get";
-      let kubeconfigfilePath = "";
+      let kubeconfigfilePath:any = "";
       if (command === "logout") {
           kubeconfigfilePath = tl.getVariable("KUBECONFIG");
       }
 
-      let connection = new clusterconnection_1.default(kubeconfigfilepath);
+      let connection = new clusterconnection_1.default(kubeconfigfilePath);
 
       try {
         console.log(connection);
@@ -84,7 +86,7 @@ async function run() {
             if (command !== "login") {
                 connection.close();
             }
-        }).catch((error) => {
+        }).catch((error:any) => {
             tl.setResult(tl.TaskResult.Failed, error.message);
             connection.close();
         });
@@ -170,23 +172,23 @@ async function run() {
   }
 }
 
-async function executeKubectlCommand(clusterConnection, command, args) {
-  var commandMap = {
-      "login": "./kuberneteslogin",
-      "logout": "./kuberneteslogout"
-  };
-  var commandImplementation = require("./kubernetescommand");
-  if (command in commandMap) {
-    commandImplementation = require(commandMap[command]);
+async function executeKubectlCommand(clusterConnection:any, command:string, args:string) {
+  var commandImplementation = require("./src/kubernetescommand");
+
+  if(command === "login") {
+    commandImplementation = "./kuberneteslogin";
+  } else if(command === "logout") {
+    commandImplementation = "./kuberneteslogout";
   }
+
   var telemetry = {
-    registryType: registryType,
+    registryType: "Azure Container Registry",
     command: command
   };
 
   console.log("##vso[telemetry.publish area=%s;feature=%s]%s", "TaskEndpointId", "KubernetesV1", JSON.stringify(telemetry));
   var result = "";
-  return commandImplementation.run(clusterConnection, command, args, (data) => result += data)
+  return commandImplementation.run(clusterConnection, command, args, (data:any) => result += data)
       .fin(function cleanup() {
           var commandOutputLength = result.length;
           if (commandOutputLength > environmentVariableMaximumSize) {
