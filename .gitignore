@@ -1,4 +1,4 @@
 node_modules
 *.js
 **/*.js
-!**/ACRAKSAccess/*.js
+!**/ACRAKSAccess/src/**/*.js
