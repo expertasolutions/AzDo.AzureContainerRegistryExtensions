@@ -1,7 +1,5 @@
 # Purpose & description
-Tasks to help with the rights assignation between Azure Kubernetes Cluster instance and Azure Container Registry.
-
-![MasterBuildStatus](https://dev.azure.com/experta/Community/_apis/build/status/expertasolutions.AzureContainerRegistryExtensions?branchName=master)
+Tasks to help with the rights assignation between Azure Kubernetes Cluster instance and Azure Container Registry. See ***[Release notes](https://github.com/expertasolutions/AzureContainerRegistryExtensions/releases)***
 
 # Prerequisites to be used
 The **Service Principal** used with your Azure Service Connection endpoint need to be 'Owner' of you **Azure subscription** where your **Azure Container Registry** is created.
