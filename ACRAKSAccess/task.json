@@ -4,7 +4,7 @@
     "friendlyName": "ACRAKS Access",
     "description": "Set ACR Access to Kubernetes cluster",
     "helpMarkDown": "",
-    "preview": true,
+    "preview": false,
     "category": "Utility",
     "author": "Solutions Experta Inc.",
     "version": {
