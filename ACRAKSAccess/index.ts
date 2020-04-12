@@ -5,9 +5,10 @@ import * as resourceManagement from '@azure/arm-resources';
 import * as auth from '@azure/arm-authorization';
 import * as graph from '@azure/graph';
 
-const clusterconnection_1 = require("./src/clusterconnection");
+//const clusterconnection_1 = require("./src/clusterconnection");
 const environmentVariableMaximumSize = 32766;
 
+/*
 async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:string, tenantId:string) {
     return await msRestNodeAuth.loginWithServicePrincipalSecret(servicePrincipalId, servicePrincipalKey, tenantId );
 };
@@ -15,6 +16,8 @@ async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:strin
 async function runKubeCtlCommand(clusterConnection:any, command:string) {
   return await executeKubectlCommand(clusterConnection, "get", "service ");
 };
+
+*/
 
 async function run() {
   try { 
@@ -67,6 +70,7 @@ async function run() {
 
     const aksCreds:any = await LoginToAzure(aksServicePrincipalId, aksServicePrincipalKey, aksTenantId);
     if(registerMode === "aksSecret") {
+      /*
       const clusterconnection_1 = require("./clusterconnection");
 
       let command = "get";
@@ -93,7 +97,7 @@ async function run() {
       } catch(error) {
         tl.setResult(tl.TaskResult.Failed, error.message);
       }
-
+      */
       //tl.setVariable("imagePullSecretName", "patate", true);
 
     } else {
@@ -171,7 +175,7 @@ async function run() {
     tl.setResult(tl.TaskResult.Failed, err.message || 'run() failed');
   }
 }
-
+/*
 async function executeKubectlCommand(clusterConnection:any, command:string, args:string) {
   var commandImplementation = require("./kubernetescommand");
 
@@ -199,5 +203,6 @@ async function executeKubectlCommand(clusterConnection:any, command:string, args
           }
       });
   }
-  
+*/
+
 run();
