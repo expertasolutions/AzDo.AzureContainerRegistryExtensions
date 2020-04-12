@@ -6,13 +6,13 @@ import * as auth from '@azure/arm-authorization';
 import * as graph from '@azure/graph';
 
 //const clusterconnection_1 = require("./src/clusterconnection");
-const environmentVariableMaximumSize = 32766;
+//const environmentVariableMaximumSize = 32766;
 
-/*
 async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:string, tenantId:string) {
     return await msRestNodeAuth.loginWithServicePrincipalSecret(servicePrincipalId, servicePrincipalKey, tenantId );
 };
 
+/*
 async function runKubeCtlCommand(clusterConnection:any, command:string) {
   return await executeKubectlCommand(clusterConnection, "get", "service ");
 };

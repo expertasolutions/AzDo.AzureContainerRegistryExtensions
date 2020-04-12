@@ -48,8 +48,8 @@ var msRestNodeAuth = __importStar(require("@azure/ms-rest-nodeauth"));
 var resourceManagement = __importStar(require("@azure/arm-resources"));
 var auth = __importStar(require("@azure/arm-authorization"));
 var graph = __importStar(require("@azure/graph"));
-var clusterconnection_1 = require("./src/clusterconnection");
-var environmentVariableMaximumSize = 32766;
+//const clusterconnection_1 = require("./src/clusterconnection");
+//const environmentVariableMaximumSize = 32766;
 function LoginToAzure(servicePrincipalId, servicePrincipalKey, tenantId) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -61,21 +61,16 @@ function LoginToAzure(servicePrincipalId, servicePrincipalKey, tenantId) {
     });
 }
 ;
-function runKubeCtlCommand(clusterConnection, command) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, executeKubectlCommand(clusterConnection, "get", "service ")];
-                case 1: return [2 /*return*/, _a.sent()];
-            }
-        });
-    });
-}
-;
+/*
+async function runKubeCtlCommand(clusterConnection:any, command:string) {
+  return await executeKubectlCommand(clusterConnection, "get", "service ");
+};
+
+*/
 function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var acrSubscriptionEndpoint, acrSubcriptionId_1, acrServicePrincipalId, acrServicePrincipalKey, acrTenantId, aksSubscriptionEndpoint, aksSubcriptionId, aksServicePrincipalId, aksServicePrincipalKey, aksTenantId, registerMode, acrResourceGroup, containerRegistry_1, aksResourceGroup, aksCluster_1, acrUsername, acrPassword, aksCreds, clusterconnection_1_1, command_1, kubeconfigfilePath, connection_1, aksResourceClient, rsList, aksClusterInstance, aksInfoResult, clientId_1, aksAppCreds, aksGraphClient, aksFilterValue, aksServiceFilter, aksSearch, aksServicePrincipal_1, acrCreds, acrResourceClient, acrResult, acrInstance, acrAuthClient, acrPullRoleName_1, roles, acrRole_1, rs, roleAssignment, newRoleParm, newRoleResult, err_1;
+        var acrSubscriptionEndpoint, acrSubcriptionId_1, acrServicePrincipalId, acrServicePrincipalKey, acrTenantId, aksSubscriptionEndpoint, aksSubcriptionId, aksServicePrincipalId, aksServicePrincipalKey, aksTenantId, registerMode, acrResourceGroup, containerRegistry_1, aksResourceGroup, aksCluster_1, acrUsername, acrPassword, aksCreds, aksResourceClient, rsList, aksClusterInstance, aksInfoResult, clientId_1, aksAppCreds, aksGraphClient, aksFilterValue, aksServiceFilter, aksSearch, aksServicePrincipal_1, acrCreds, acrResourceClient, acrResult, acrInstance, acrAuthClient, acrPullRoleName_1, roles, acrRole_1, rs, roleAssignment, newRoleParm, newRoleResult, err_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -124,30 +119,6 @@ function run() {
                 case 1:
                     aksCreds = _b.sent();
                     if (!(registerMode === "aksSecret")) return [3 /*break*/, 2];
-                    clusterconnection_1_1 = require("./clusterconnection");
-                    command_1 = "get";
-                    kubeconfigfilePath = "";
-                    if (command_1 === "logout") {
-                        kubeconfigfilePath = tl.getVariable("KUBECONFIG");
-                    }
-                    connection_1 = new clusterconnection_1_1.default(kubeconfigfilePath);
-                    try {
-                        console.log(connection_1);
-                        connection_1.open().then(function () {
-                            return runKubeCtlCommand(connection_1, command_1);
-                        })
-                            .then(function () {
-                            if (command_1 !== "login") {
-                                connection_1.close();
-                            }
-                        }).catch(function (error) {
-                            tl.setResult(tl.TaskResult.Failed, error.message);
-                            connection_1.close();
-                        });
-                    }
-                    catch (error) {
-                        tl.setResult(tl.TaskResult.Failed, error.message);
-                    }
                     return [3 /*break*/, 12];
                 case 2:
                     console.log("RBAC Access mode");
@@ -234,34 +205,33 @@ function run() {
         });
     });
 }
-function executeKubectlCommand(clusterConnection, command, args) {
-    return __awaiter(this, void 0, void 0, function () {
-        var commandImplementation, telemetry, result;
-        return __generator(this, function (_a) {
-            commandImplementation = require("./kubernetescommand");
-            if (command === "login") {
-                commandImplementation = "./kuberneteslogin";
-            }
-            else if (command === "logout") {
-                commandImplementation = "./kuberneteslogout";
-            }
-            telemetry = {
-                registryType: "Azure Container Registry",
-                command: command
-            };
-            console.log("##vso[telemetry.publish area=%s;feature=%s]%s", "TaskEndpointId", "KubernetesV1", JSON.stringify(telemetry));
-            result = "";
-            return [2 /*return*/, commandImplementation.run(clusterConnection, command, args, function (data) { return result += data; })
-                    .fin(function cleanup() {
-                    var commandOutputLength = result.length;
-                    if (commandOutputLength > environmentVariableMaximumSize) {
-                        tl.warning(tl.loc("OutputVariableDataSizeExceeded", commandOutputLength, environmentVariableMaximumSize));
-                    }
-                    else {
-                        tl.setVariable('podServiceContent', result);
-                    }
-                })];
-        });
-    });
-}
+/*
+async function executeKubectlCommand(clusterConnection:any, command:string, args:string) {
+  var commandImplementation = require("./kubernetescommand");
+
+  if(command === "login") {
+    commandImplementation = "./kuberneteslogin";
+  } else if(command === "logout") {
+    commandImplementation = "./kuberneteslogout";
+  }
+
+  var telemetry = {
+    registryType: "Azure Container Registry",
+    command: command
+  };
+
+  console.log("##vso[telemetry.publish area=%s;feature=%s]%s", "TaskEndpointId", "KubernetesV1", JSON.stringify(telemetry));
+  var result = "";
+  return commandImplementation.run(clusterConnection, command, args, (data:any) => result += data)
+      .fin(function cleanup() {
+          var commandOutputLength = result.length;
+          if (commandOutputLength > environmentVariableMaximumSize) {
+            tl.warning(tl.loc("OutputVariableDataSizeExceeded", commandOutputLength, environmentVariableMaximumSize));
+          }
+          else {
+            tl.setVariable('podServiceContent', result);
+          }
+      });
+  }
+*/
 run();
