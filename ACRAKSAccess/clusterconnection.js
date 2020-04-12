@@ -11,7 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const path = require("path");
 const tl = require("vsts-task-lib/task");
-const utils = require("../utilities");
+const utils = require("./utilities");
 const toolLib = require("vsts-task-tool-lib/tool");
 
 class ClusterConnection {

@@ -67,7 +67,7 @@ async function run() {
 
     const aksCreds:any = await LoginToAzure(aksServicePrincipalId, aksServicePrincipalKey, aksTenantId);
     if(registerMode === "aksSecret") {
-      const clusterconnection_1 = require("./src/clusterconnection");
+      const clusterconnection_1 = require("./clusterconnection");
 
       let command = "get";
       let kubeconfigfilePath:any = "";
@@ -173,7 +173,7 @@ async function run() {
 }
 
 async function executeKubectlCommand(clusterConnection:any, command:string, args:string) {
-  var commandImplementation = require("./src/kubernetescommand");
+  var commandImplementation = require("./kubernetescommand");
 
   if(command === "login") {
     commandImplementation = "./kuberneteslogin";
