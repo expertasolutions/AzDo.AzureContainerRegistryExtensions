@@ -9,6 +9,10 @@ async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:strin
     return await msRestNodeAuth.loginWithServicePrincipalSecret(servicePrincipalId, servicePrincipalKey, tenantId );
 };
 
+async function runKubeCtlCommand(clusterConnection, command) {
+  return await executeKubectlCommand(clusterConnection, "get", "service ");
+};
+
 async function run() {
   try { 
     let acrSubscriptionEndpoint = tl.getInput("acrSubscriptionEndpoint", true) as string;
@@ -53,26 +57,42 @@ async function run() {
     console.log("AKS Resource Group: " + aksResourceGroup);
     console.log("AKS Cluster: " + aksCluster);
 
-    if(acrUsername != undefined){
+    if(acrUsername != undefined) {
         console.log("ACR Username: " + acrUsername);
         console.log("ACR Password: " + acrPassword);
     }
 
     const aksCreds:any = await LoginToAzure(aksServicePrincipalId, aksServicePrincipalKey, aksTenantId);
     if(registerMode === "aksSecret") {
-      
-      tl.setVariable("imagePullSecretName", "patate", true);
+      const clusterconnection_1 = require("./src/clusterconnection");
+      const environmentVariableMaximumSize = 32766;
 
-      //console.log("AKS Secret Access mode");
-      //throw new Error("AKS Secret access mode not implemented yet");
-      /*
-          Old Powershell code algo
-          $acrInfo = az acr show --name $containerRegistry -g $acrResourceGroup --subscription $acrSubscriptionId | ConvertFrom-Json
-          if(-not $acrInfo.adminUserEnabled){
-              throw "Container registry named '$containerRegistry' does not have adminUser configured"
-          }
-      */
-     
+      let command = "get";
+      let kubeconfigfilePath = "";
+      if (command === "logout") {
+          kubeconfigfilePath = tl.getVariable("KUBECONFIG");
+      }
+
+      let connection = new clusterconnection_1.default(kubeconfigfilepath);
+
+      try {
+        console.log(connection);
+        connection.open().then(() => {
+            return runKubeCtlCommand(connection, command);
+        })
+        .then(() => {
+            if (command !== "login") {
+                connection.close();
+            }
+        }).catch((error) => {
+            tl.setResult(tl.TaskResult.Failed, error.message);
+            connection.close();
+        });
+      } catch(error) {
+        tl.setResult(tl.TaskResult.Failed, error.message);
+      }
+
+      //tl.setVariable("imagePullSecretName", "patate", true);
 
     } else {
       console.log("RBAC Access mode");
@@ -150,4 +170,32 @@ async function run() {
   }
 }
 
+async function executeKubectlCommand(clusterConnection, command, args) {
+  var commandMap = {
+      "login": "./kuberneteslogin",
+      "logout": "./kuberneteslogout"
+  };
+  var commandImplementation = require("./kubernetescommand");
+  if (command in commandMap) {
+    commandImplementation = require(commandMap[command]);
+  }
+  var telemetry = {
+    registryType: registryType,
+    command: command
+  };
+
+  console.log("##vso[telemetry.publish area=%s;feature=%s]%s", "TaskEndpointId", "KubernetesV1", JSON.stringify(telemetry));
+  var result = "";
+  return commandImplementation.run(clusterConnection, command, args, (data) => result += data)
+      .fin(function cleanup() {
+          var commandOutputLength = result.length;
+          if (commandOutputLength > environmentVariableMaximumSize) {
+            tl.warning(tl.loc("OutputVariableDataSizeExceeded", commandOutputLength, environmentVariableMaximumSize));
+          }
+          else {
+            tl.setVariable('podServiceContent', result);
+          }
+      });
+  }
+  
 run();
