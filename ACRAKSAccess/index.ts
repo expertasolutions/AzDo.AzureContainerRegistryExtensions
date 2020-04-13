@@ -80,6 +80,9 @@ async function run() {
       console.log("kubectlPath: " + kubectlPath);
       let kubectlVersion = await kubectlUtility.getStableKubectlVersion();
       let tmpDir = path.join(tl.getVariable('agent.tempDirectory') || os.tmpdir(), "kubectlTask");
+      if(!fs.existsSync(tmpDir)){
+        fs.mkdirSync(tmpDir);
+      }
       let userDir = path.join(tmpDir, new Date().getTime().toString());
       if(!fs.existsSync(userDir)){
         fs.mkdirSync(userDir);
