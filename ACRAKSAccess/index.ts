@@ -91,6 +91,9 @@ async function run() {
       //var kubectlCmd = tl.tool(kubectlPath);
 
       tl.setVariable("imagePullSecretName", "patate", true);
+
+      throw new Error("AKS Secret access mode not implemented yet");
+
     } else {
       console.log("RBAC Access mode");
       console.log("Looking for Azure Kubernetes service cluster ...");
