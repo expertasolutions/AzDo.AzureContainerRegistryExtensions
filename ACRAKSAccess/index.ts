@@ -62,6 +62,7 @@ async function run() {
       console.log("ACR Password: " + acrPassword);
     }
 
+    //----------------------------------------------------------------------------------------------------
     console.log("Looking for Azure Kubernetes service cluster ...");
     const aksCreds:any = await LoginToAzure(aksServicePrincipalId, aksServicePrincipalKey, aksTenantId);
     let aksResourceClient = new resourceManagement.ResourceManagementClient(aksCreds, aksSubcriptionId);
@@ -73,8 +74,22 @@ async function run() {
     let aksInfoResult = await aksResourceClient.resources.getById(aksClusterInstance?.id, '2019-10-01');
     const clientId = aksInfoResult.properties.servicePrincipalProfile.clientId;
 
+    let aksAppCreds:any = new msRestNodeAuth.ApplicationTokenCredentials(aksCreds.clientId, aksTenantId, aksCreds.secret, 'graph');
+    let aksGraphClient = new graph.GraphRbacManagementClient(aksAppCreds, aksTenantId, { baseUri: 'https://graph.windows.net' });
+    let aksFilterValue = "appId eq '" + clientId + "'";
+    let aksServiceFilter = { filter: aksFilterValue };
+
+    let aksSearch = await aksGraphClient.servicePrincipals.list(aksServiceFilter);
+    let aksServicePrincipal:any = aksSearch.find((element : any) => {
+      return element.appId === clientId;
+    });
+
+    if(aksServicePrincipal === undefined){
+      throw new Error("AKS Service Principal not found");
+    }
+    //----------------------------------------------------------------------------------------------------
+
     if(registerMode === "aksSecret") {
-      console.log("Kubernetes Secret Access mode");
 
       let kubectlPath = tl.which("kubectl", false);
       console.log("kubectlPath: " + kubectlPath);
@@ -91,8 +106,17 @@ async function run() {
       console.log("KubectlVersion: " + kubectlVersion);
       let kubectlDownload = await kubectlUtility.downloadKubectl(kubectlVersion);
       console.log("KubectlDownload: " + kubectlDownload);
+      kubectlPath = kubectlDownload;
+      
+      console.log("kubeConfig: " + aksInfoResult.properties.kubeConfig);
+      // Get KubeConfigFromAKS
+      let webClient = undefined;
+      let aksRequest = "//subscriptions/{subscriptionId}/resourceGroups/{ResourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{ClusterName}/accessProfiles/clusterUser";
+      //let aksRequest = "https://management.azure.com/subscriptions/c613aec0-2955-4f3a-8682-c9fc4aa4a998/resourceGroups/Experta_Production/providers/Microsoft.ContainerService/managedClusters/aksexpertaprod1167/accessProfiles/clusterUser?api-version=2017-08-31";
+      
+      let kubeconfigFile = ""
+      var kubectlCmd = tl.tool(kubectlPath);
 
-      //var kubectlCmd = tl.tool(kubectlPath);
 
       tl.setVariable("imagePullSecretName", "patate", true);
 
@@ -100,22 +124,8 @@ async function run() {
 
     } else {
       console.log("RBAC Access mode");
-      console.log("Looking for Azure Kubernetes service cluster ...");
       
-      let aksAppCreds:any = new msRestNodeAuth.ApplicationTokenCredentials(aksCreds.clientId, aksTenantId, aksCreds.secret, 'graph');
-      let aksGraphClient = new graph.GraphRbacManagementClient(aksAppCreds, aksTenantId, { baseUri: 'https://graph.windows.net' });
-      let aksFilterValue = "appId eq '" + clientId + "'";
-      let aksServiceFilter = { filter: aksFilterValue };
-
-      let aksSearch = await aksGraphClient.servicePrincipals.list(aksServiceFilter);
-      let aksServicePrincipal:any = aksSearch.find((element : any) => {
-        return element.appId === clientId;
-      });
-
-      if(aksServicePrincipal === undefined){
-        throw new Error("AKS Service Principal not found");
-      }
-
+      
       // Get the Azure Container Registry Resource infos
       let acrCreds:any = await LoginToAzure(acrServicePrincipalId, acrServicePrincipalKey, acrTenantId);
       let acrResourceClient = new resourceManagement.ResourceManagementClient(acrCreds, acrSubcriptionId);
