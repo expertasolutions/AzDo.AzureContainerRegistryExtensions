@@ -90,6 +90,7 @@ async function run() {
 
       console.log("KubectlVersion: " + kubectlVersion);
       let kubectlDownload = await kubectlUtility.downloadKubectl(kubectlVersion);
+      console.log("KubectlDownload: " + kubectlDownload);
 
       //var kubectlCmd = tl.tool(kubectlPath);
 
