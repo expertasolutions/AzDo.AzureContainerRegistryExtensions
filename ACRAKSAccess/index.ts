@@ -4,20 +4,11 @@ import * as msRestNodeAuth from '@azure/ms-rest-nodeauth';
 import * as resourceManagement from '@azure/arm-resources';
 import * as auth from '@azure/arm-authorization';
 import * as graph from '@azure/graph';
-
-//const clusterconnection_1 = require("./src/clusterconnection");
-//const environmentVariableMaximumSize = 32766;
+import * as kubectlUtility from 'utility-common/kubectlutility';
 
 async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:string, tenantId:string) {
     return await msRestNodeAuth.loginWithServicePrincipalSecret(servicePrincipalId, servicePrincipalKey, tenantId );
 };
-
-/*
-async function runKubeCtlCommand(clusterConnection:any, command:string) {
-  return await executeKubectlCommand(clusterConnection, "get", "service ");
-};
-
-*/
 
 async function run() {
   try { 
@@ -64,54 +55,34 @@ async function run() {
     console.log("AKS Cluster: " + aksCluster);
 
     if(acrUsername != undefined) {
-        console.log("ACR Username: " + acrUsername);
-        console.log("ACR Password: " + acrPassword);
+      console.log("ACR Username: " + acrUsername);
+      console.log("ACR Password: " + acrPassword);
     }
 
+    console.log("Looking for Azure Kubernetes service cluster ...");
     const aksCreds:any = await LoginToAzure(aksServicePrincipalId, aksServicePrincipalKey, aksTenantId);
+    let aksResourceClient = new resourceManagement.ResourceManagementClient(aksCreds, aksSubcriptionId);
+    let rsList = await aksResourceClient.resources.list();
+    let aksClusterInstance:any = rsList.find((element: any) => {
+      return element.name === aksCluster;
+    });
+
+    let aksInfoResult = await aksResourceClient.resources.getById(aksClusterInstance?.id, '2019-10-01');
+    const clientId = aksInfoResult.properties.servicePrincipalProfile.clientId;
+
     if(registerMode === "aksSecret") {
-      /*
-      const clusterconnection_1 = require("./clusterconnection");
+      console.log("Kubernetes Secret Access mode");
 
-      let command = "get";
-      let kubeconfigfilePath:any = "";
-      if (command === "logout") {
-          kubeconfigfilePath = tl.getVariable("KUBECONFIG");
-      }
+      let kubectlPath = tl.which("kubectl", false);
+      console.log("kubectlPath: " + kubectlPath);
+      let kubectlVersion = await kubectlUtility.getStableKubectlVersion();
+      console.log("KubectlVersion: " + kubectlVersion);
 
-      let connection = new clusterconnection_1.default(kubeconfigfilePath);
-
-      try {
-        console.log(connection);
-        connection.open().then(() => {
-            return runKubeCtlCommand(connection, command);
-        })
-        .then(() => {
-            if (command !== "login") {
-                connection.close();
-            }
-        }).catch((error:any) => {
-            tl.setResult(tl.TaskResult.Failed, error.message);
-            connection.close();
-        });
-      } catch(error) {
-        tl.setResult(tl.TaskResult.Failed, error.message);
-      }
-      */
-      //tl.setVariable("imagePullSecretName", "patate", true);
-
+      tl.setVariable("imagePullSecretName", "patate", true);
     } else {
       console.log("RBAC Access mode");
       console.log("Looking for Azure Kubernetes service cluster ...");
-
-      let aksResourceClient = new resourceManagement.ResourceManagementClient(aksCreds, aksSubcriptionId);
-      let rsList = await aksResourceClient.resources.list();
-      let aksClusterInstance:any = rsList.find((element: any) => {
-        return element.name === aksCluster;
-      });
-
-      let aksInfoResult = await aksResourceClient.resources.getById(aksClusterInstance?.id, '2019-10-01');
-      const clientId = aksInfoResult.properties.servicePrincipalProfile.clientId;
+      
       let aksAppCreds:any = new msRestNodeAuth.ApplicationTokenCredentials(aksCreds.clientId, aksTenantId, aksCreds.secret, 'graph');
       let aksGraphClient = new graph.GraphRbacManagementClient(aksAppCreds, aksTenantId, { baseUri: 'https://graph.windows.net' });
       let aksFilterValue = "appId eq '" + clientId + "'";
@@ -175,34 +146,5 @@ async function run() {
     tl.setResult(tl.TaskResult.Failed, err.message || 'run() failed');
   }
 }
-/*
-async function executeKubectlCommand(clusterConnection:any, command:string, args:string) {
-  var commandImplementation = require("./kubernetescommand");
-
-  if(command === "login") {
-    commandImplementation = "./kuberneteslogin";
-  } else if(command === "logout") {
-    commandImplementation = "./kuberneteslogout";
-  }
-
-  var telemetry = {
-    registryType: "Azure Container Registry",
-    command: command
-  };
-
-  console.log("##vso[telemetry.publish area=%s;feature=%s]%s", "TaskEndpointId", "KubernetesV1", JSON.stringify(telemetry));
-  var result = "";
-  return commandImplementation.run(clusterConnection, command, args, (data:any) => result += data)
-      .fin(function cleanup() {
-          var commandOutputLength = result.length;
-          if (commandOutputLength > environmentVariableMaximumSize) {
-            tl.warning(tl.loc("OutputVariableDataSizeExceeded", commandOutputLength, environmentVariableMaximumSize));
-          }
-          else {
-            tl.setVariable('podServiceContent', result);
-          }
-      });
-  }
-*/
 
 run();

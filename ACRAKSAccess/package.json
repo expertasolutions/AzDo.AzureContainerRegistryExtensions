@@ -1,5 +1,5 @@
 {
-  "name": "ACRAKSAccess",
+  "name": "acraksaccess",
   "version": "1.0.0",
   "description": "Set ACR Access to Kubernetes cluster",
   "main": "index.js",
@@ -16,7 +16,6 @@
     "@azure/ms-rest-nodeauth": "^2.0.5",
     "@types/q": "^1.5.2",
     "azure-pipelines-task-lib": "^2.9.3",
-    "docker-common": "file:../_builds/docker-common-1.0.0.tgz",
     "utility-common": "file:../_builds/utility-common-1.0.2.tgz"
   }
 }
