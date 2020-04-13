@@ -5,6 +5,9 @@ import * as resourceManagement from '@azure/arm-resources';
 import * as auth from '@azure/arm-authorization';
 import * as graph from '@azure/graph';
 import * as kubectlUtility from 'utility-common/kubectlutility';
+import * as path from 'path';
+import * as os from 'os';
+import * as fs from 'fs';
 
 async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:string, tenantId:string) {
     return await msRestNodeAuth.loginWithServicePrincipalSecret(servicePrincipalId, servicePrincipalKey, tenantId );
@@ -76,7 +79,16 @@ async function run() {
       let kubectlPath = tl.which("kubectl", false);
       console.log("kubectlPath: " + kubectlPath);
       let kubectlVersion = await kubectlUtility.getStableKubectlVersion();
+      let tmpDir = path.join(tl.getVariable('agent.tempDirectory') || os.tmpdir(), "kubectlTask");
+      let userDir = path.join(tmpDir, new Date().getTime().toString());
+      if(!fs.existsSync(userDir)){
+        fs.mkdirSync(userDir);
+      }
+
       console.log("KubectlVersion: " + kubectlVersion);
+      let kubectlDownload = await kubectlUtility.downloadKubectl(kubectlVersion);
+
+      //var kubectlCmd = tl.tool(kubectlPath);
 
       tl.setVariable("imagePullSecretName", "patate", true);
     } else {
