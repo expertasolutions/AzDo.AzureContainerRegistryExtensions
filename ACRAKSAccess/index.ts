@@ -108,7 +108,16 @@ async function run() {
       console.log("KubectlDownload: " + kubectlDownload);
       kubectlPath = kubectlDownload;
       
+      console.log("************");
+      console.log("");
+      console.log("aksInfoResult = " + JSON.stringify(aksInfoResult));
+      console.log("");
+      console.log("************");
+      console.log("************");
+      console.log("");
       console.log("aksInfoResult.properties = " + JSON.stringify(aksInfoResult.properties));
+      console.log("");
+      console.log("************");
 
       console.log("kubeConfig: " + aksInfoResult.properties.kubeConfig);
       let base64KubeConfig = Buffer.from(aksInfoResult.properties.kubeConfig, 'base64');
