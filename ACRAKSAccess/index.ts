@@ -189,7 +189,7 @@ async function run() {
         let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry testlouis --docker-server=patate --docker-username=test --docker-password=test", kubectlPath);
         console.log("Create Secret Result: " + cmdCreateSecret);
 
-        let cmdResult = await kubectl("get", [], [], "pod","", kubectlPath);
+        let cmdResult = await kubectl("get", [], [], "secret","", kubectlPath);
         console.log("Get Pod Result: " + cmdResult);
         /*
         kubectlCmd.arg("get");
