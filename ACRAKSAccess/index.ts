@@ -8,6 +8,7 @@ import * as kubectlUtility from 'utility-common/kubectlutility';
 import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
+import * as https from 'https';
 
 async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:string, tenantId:string) {
     return await msRestNodeAuth.loginWithServicePrincipalSecret(servicePrincipalId, servicePrincipalKey, tenantId );
@@ -108,22 +109,18 @@ async function run() {
       console.log("KubectlDownload: " + kubectlDownload);
       kubectlPath = kubectlDownload;
       
-      console.log("aksGraphClient: " + JSON.stringify(aksGraphClient));
+      console.log("aksGraphClient: " + JSON.stringify(aksCreds));
+
+      let httpResult = https.get('');
       
       let oauthToken = "";
       let authHeader = "Authorization: Bearer " + oauthToken;
       let contentType = "application/json";
 
-      console.log("************");
-      console.log("");
-      console.log("aksInfoResult = " + JSON.stringify(aksInfoResult));
-      console.log("");
-      console.log("************");
-      console.log("************");
-      console.log("");
-      console.log("aksInfoResult.properties = " + JSON.stringify(aksInfoResult.properties));
-      console.log("");
-      console.log("************");
+      // https://management.azure.com/subscriptions/c613aec0-2955-4f3a-8682-c9fc4aa4a998/resourceGroups/Experta_Production/providers/Microsoft.ContainerService/managedClusters/aksexpertaprod1167/accessProfiles/clusterUser?api-version=2017-08-31
+      // or
+      // https://management.azure.com/subscriptions/c613aec0-2955-4f3a-8682-c9fc4aa4a998/resourceGroups/Experta_Production/providers/Microsoft.ContainerService/managedClusters/aksexpertaprod1167/accessProfiles/clusterUser?api-version=2020-02-01
+      // https://management.azure.com/subscriptions/c613aec0-2955-4f3a-8682-c9fc4aa4a998/resourceGroups/Experta_Production/providers/Microsoft.ContainerService/managedClusters/aksexpertaprod1167/accessProfiles/clusterUser/listCredential?api-version=2020-02-01
 
       console.log("kubeConfig: " + aksInfoResult.properties.kubeConfig);
       let base64KubeConfig = Buffer.from(aksInfoResult.properties.kubeConfig, 'base64');
