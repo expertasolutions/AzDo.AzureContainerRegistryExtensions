@@ -109,9 +109,33 @@ async function run() {
       console.log("KubectlDownload: " + kubectlDownload);
       kubectlPath = kubectlDownload;
       
-      console.log("aksGraphClient: " + JSON.stringify(aksCreds));
+      let bearerToken = aksCreds.tokenCache._entries[0].accessToken;
+      console.log("aksCreds.tokenCache._entries.accessToken: " + bearerToken);
+      console.log("aksCreds.secret: " + aksCreds.secret);
 
-      let httpResult = https.get('');
+      let apiPath = "/subscriptions/" + aksSubcriptionId + "/resourceGroups/" + aksResourceGroup + "/providers/Microsoft.ContainerService/managedClusters/" + aksCluster + "/accessProfiles/clusterUser?api-version=2020-02-01";
+      console.log("apiPath: " + apiPath);
+
+      let getOptions = {
+        hostname: 'management.azure.com',
+        port: 443,
+        path: apiPath,
+        method: 'GET',
+        auth: 'Bearer ' + bearerToken
+      };
+
+      const req = https.request(getOptions, res => {
+        console.log('statusCode: ${res.statusCode}');
+        res.on('data', d=> {
+          process.stdout.write(d);
+        });
+      });
+
+      req.on('error', error => {
+        console.error(error);
+      });
+
+      req.end();
       
       let oauthToken = "";
       let authHeader = "Authorization: Bearer " + oauthToken;
