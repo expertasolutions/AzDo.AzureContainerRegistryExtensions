@@ -14,6 +14,25 @@ async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:strin
     return await msRestNodeAuth.loginWithServicePrincipalSecret(servicePrincipalId, servicePrincipalKey, tenantId );
 };
 
+async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line:string, kubectlPath:string) {
+  let kubectlCmd = tl.tool(kubectlPath);
+  kubectlCmd.on("stout", output => {
+    console.log(output);
+  });
+
+  kubectlCmd.arg(cmd);
+  kubectlCmd.arg(namespace);
+  kubectlCmd.arg(configFile);
+  kubectlCmd.line(type)
+  kubectlCmd.line(line);
+
+  return await kubectlCmd.exec()
+                        .fail(error => {
+                          console.log("fail");
+                          throw error;
+                        });
+}
+
 function httpsGetRequest(httpsOptions:any) {
   return new Promise((resolve, reject) => {
     const req = https.request(httpsOptions, (response) => {
@@ -154,10 +173,21 @@ async function run() {
       fs.writeFileSync(kubeConfigFile, kubeConfig);
       process.env["KUBECONFIG"] = kubeConfigFile;
       try {
+        /*
         let kubectlCmd = tl.tool(kubectlPath);
         kubectlCmd.on("stout", output => {
           console.log(output);
         })
+        */
+        
+        // kubectl create secret docker-registry testlouis --docker-server=patate --docker-username=test --docker-password=test
+        
+        let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry testlouis --docker-server=patate --docker-username=test --docker-password=test", kubectlPath);
+        console.log("Create Secret Result: " + cmdCreateSecret);
+        
+        let cmdResult = await kubectl("get", [], [], "pod","-o json", kubectlPath);
+        console.log("Get Pod Result: " + cmdResult);
+        /*
         kubectlCmd.arg("get");
         // Namespace
         kubectlCmd.arg([]);
@@ -175,8 +205,8 @@ async function run() {
                                     console.log("fail");
                                     throw error;
                                   });
-        console.log("Result: " + cmdResult);
-        
+        */
+
       } catch {
         console.log("global error from kubectlCmd");
       }
