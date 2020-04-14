@@ -130,7 +130,8 @@ async function run() {
       const req = https.request(getOptions, res => {
         console.log("statusCode: " + res.statusCode);
         res.on('data', d => {
-          process.stdout.write(d);
+          //process.stdout.write(d);
+          console.log("Data: " + d);
         });
       });
 
