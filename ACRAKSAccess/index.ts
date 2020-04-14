@@ -151,20 +151,12 @@ async function run() {
         }
       };
 
-      let test = await httpsGetRequest(getOptions);
-      httpsGetRequest(getOptions).then(response => {
-        console.log("Response: " + response);
-      });
-      console.log("OutData: " + test);
-      
-      let oauthToken = "";
-      let authHeader = "Authorization: Bearer " + oauthToken;
-      let contentType = "application/json";
-
-      // accessProfiles/clusterUser?api-version=2017-08-31
-
-      console.log("kubeConfig: " + aksInfoResult.properties.kubeConfig);
-      let base64KubeConfig = Buffer.from(aksInfoResult.properties.kubeConfig, 'base64');
+      let httpResponse = await httpsGetRequest(getOptions);
+      let rawKubeConfig = JSON.parse(httpResponse as string).properties.kubeConfig;
+      console.log("OutData: " + rawKubeConfig);
+      console.log("kubeConfig: " + rawKubeConfig);
+      let base64KubeConfig = rawKubeConfig;
+      //let base64KubeConfig = Buffer.from(rawKubeConfig, 'base64');
       console.log("kubeConfig base64: " + base64KubeConfig.toString());
 
       let kubeConfig = base64KubeConfig.toString();
