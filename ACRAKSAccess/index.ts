@@ -126,8 +126,8 @@ async function run() {
       };
 
       const req = https.request(getOptions, res => {
-        console.log('statusCode: ${res.statusCode}');
-        res.on('data', d=> {
+        console.log("statusCode: " + res.statusCode);
+        res.on('data', d => {
           process.stdout.write(d);
         });
       });
