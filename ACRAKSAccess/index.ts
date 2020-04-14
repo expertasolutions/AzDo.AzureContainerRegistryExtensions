@@ -18,7 +18,7 @@ async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line
   let kubectlCmd = tl.tool(kubectlPath);
   let outputResult = "";
   kubectlCmd.on("stout", output => {
-    console.log(output);
+    //console.log(output);
     outputResult = output;
   });
 
@@ -34,6 +34,7 @@ async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line
                           console.log("fail");
                           throw error;
                         });
+  console.log("outputResult: " + outputResult);
   return outputResult;
 }
 
@@ -170,7 +171,7 @@ async function run() {
       let rawKubeConfig = JSON.parse(httpResponse as string).properties.kubeConfig;
       let base64KubeConfig = Buffer.from(rawKubeConfig, 'base64');
       //let base64KubeConfig = Buffer.from(rawKubeConfig, 'base64');
-      console.log("kubeConfig base64: " + base64KubeConfig.toString());
+      //console.log("kubeConfig base64: " + base64KubeConfig.toString());
 
       let kubeConfig = base64KubeConfig.toString();
       let kubeConfigFile = path.join(userDir, "config");
