@@ -165,8 +165,8 @@ async function run() {
         // Command Configuration file
         kubectlCmd.arg([]);
         // args
-        kubectlCmd.arg("pod");
-        kubectlCmd.arg("-o json");
+        kubectlCmd.line("pod");
+        kubectlCmd.line("-o json");
         kubectlCmd.on("errLine", line => {
           console.log(line);
         });
