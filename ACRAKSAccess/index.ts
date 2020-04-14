@@ -147,23 +147,40 @@ async function run() {
       let rawKubeConfig = JSON.parse(httpResponse as string).properties.kubeConfig;
       let base64KubeConfig = rawKubeConfig;
       //let base64KubeConfig = Buffer.from(rawKubeConfig, 'base64');
-      console.log("kubeConfig base64: " + base64KubeConfig.toString());
+      //console.log("kubeConfig base64: " + base64KubeConfig.toString());
 
       let kubeConfig = base64KubeConfig.toString();
       let kubeConfigFile = path.join(userDir, "config");
       fs.writeFileSync(kubeConfigFile, kubeConfig);
       process.env["KUBECONFIG"] = kubeConfigFile;
-
-      let kubectlCmd = tl.tool(kubectlPath);
-      
-
       tl.setVariable("imagePullSecretName", "patate", true);
-
+    
+      try {
+      
+      let kubectlCmd = tl.tool(kubectlPath);
+      kubectlCmd.on("stout", output => {
+        console.log(output);
+      })
+      kubectlCmd.arg("get pod");
+      let cmdArgs = [ "-f", kubeConfigFile ];
+      kubectlCmd.arg(cmdArgs);
+      kubectlCmd.arg("-o json");
+      kubectlCmd.on("errLine", line => {
+        console.log(line);
+      });
+      let cmdResult = kubectlCmd.exec()
+                                .fail(error => {
+                                  console.log("fail");
+                                  throw error;
+                                });
+      } catch {
+        console.log("global error from kubectlCmd");
+      }
+      
       if(kubeConfigFile != null && fs.existsSync(kubeConfigFile)) {
         delete process.env["KUBECONFIG"];
         fs.unlinkSync(kubeConfigFile);
       }
-
       throw new Error("AKS Secret access mode not implemented yet");
 
     } else {
