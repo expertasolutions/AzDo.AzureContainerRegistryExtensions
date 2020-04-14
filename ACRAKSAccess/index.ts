@@ -145,8 +145,6 @@ async function run() {
 
       let httpResponse = await httpsGetRequest(getOptions);
       let rawKubeConfig = JSON.parse(httpResponse as string).properties.kubeConfig;
-      console.log("OutData: " + rawKubeConfig);
-      console.log("kubeConfig: " + rawKubeConfig);
       let base64KubeConfig = rawKubeConfig;
       //let base64KubeConfig = Buffer.from(rawKubeConfig, 'base64');
       console.log("kubeConfig base64: " + base64KubeConfig.toString());
