@@ -162,8 +162,8 @@ async function run() {
           console.log(output);
         })
         kubectlCmd.arg("get");
-        let cmdArgs = [ "-f", kubeConfigFile ];
-        kubectlCmd.arg(cmdArgs);
+        //let cmdArgs = [ "-f", kubeConfigFile ];
+        //kubectlCmd.arg(cmdArgs);
         kubectlCmd.arg("pod");
         kubectlCmd.arg("-o json");
         kubectlCmd.on("errLine", line => {
