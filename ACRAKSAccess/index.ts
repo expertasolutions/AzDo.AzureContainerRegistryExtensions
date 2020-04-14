@@ -108,6 +108,12 @@ async function run() {
       console.log("KubectlDownload: " + kubectlDownload);
       kubectlPath = kubectlDownload;
       
+      console.log("aksGraphClient: " + JSON.stringify(aksGraphClient));
+      
+      let oauthToken = "";
+      let authHeader = "Authorization: Bearer " + oauthToken;
+      let contentType = "application/json";
+
       console.log("************");
       console.log("");
       console.log("aksInfoResult = " + JSON.stringify(aksInfoResult));
