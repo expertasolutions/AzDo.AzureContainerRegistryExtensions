@@ -161,9 +161,10 @@ async function run() {
       kubectlCmd.on("stout", output => {
         console.log(output);
       })
-      kubectlCmd.arg("get pod");
+      kubectlCmd.arg("get");
       let cmdArgs = [ "-f", kubeConfigFile ];
       kubectlCmd.arg(cmdArgs);
+      kubectlCmd.arg("pod");
       kubectlCmd.arg("-o json");
       kubectlCmd.on("errLine", line => {
         console.log(line);
@@ -176,7 +177,7 @@ async function run() {
       } catch {
         console.log("global error from kubectlCmd");
       }
-      
+
       if(kubeConfigFile != null && fs.existsSync(kubeConfigFile)) {
         delete process.env["KUBECONFIG"];
         fs.unlinkSync(kubeConfigFile);
