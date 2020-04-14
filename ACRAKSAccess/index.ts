@@ -151,7 +151,7 @@ async function run() {
         }
       };
 
-      let test = "";
+      let test = await httpsGetRequest(getOptions);
       httpsGetRequest(getOptions).then(response => {
         console.log("Response: " + response);
       });
