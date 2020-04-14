@@ -122,7 +122,9 @@ async function run() {
         port: 443,
         path: apiPath,
         method: 'GET',
-        auth: 'Bearer ' + bearerToken
+        headers: {
+          Authorization: ' Bearer ' + bearerToken
+        }
       };
 
       const req = https.request(getOptions, res => {
