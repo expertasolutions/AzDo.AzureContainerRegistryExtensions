@@ -115,9 +115,7 @@ async function run() {
     //----------------------------------------------------------------------------------------------------
 
     if(registerMode === "aksSecret") {
-
       let kubectlPath = tl.which("kubectl", false);
-      console.log("kubectlPath: " + kubectlPath);
       let kubectlVersion = await kubectlUtility.getStableKubectlVersion();
       let tmpDir = path.join(tl.getVariable('agent.tempDirectory') || os.tmpdir(), "kubectlTask");
       if(!fs.existsSync(tmpDir)){
@@ -128,19 +126,13 @@ async function run() {
         fs.mkdirSync(userDir);
       }
 
-      console.log("KubectlVersion: " + kubectlVersion);
       let kubectlDownload = await kubectlUtility.downloadKubectl(kubectlVersion);
-      console.log("KubectlDownload: " + kubectlDownload);
       kubectlPath = kubectlDownload;
       
       let bearerToken = aksCreds.tokenCache._entries[0].accessToken;
-      console.log("aksCreds.tokenCache._entries.accessToken: " + bearerToken);
-      console.log("aksCreds.secret: " + aksCreds.secret);
 
       let apiVersion = "2020-02-01"
       let apiPath = "/subscriptions/" + aksSubcriptionId + "/resourceGroups/" + aksResourceGroup + "/providers/Microsoft.ContainerService/managedClusters/" + aksCluster + "/accessProfiles/clusterUser?api-version=" + apiVersion;
-      console.log("apiPath: " + apiPath);
-
       let getOptions = {
         hostname: 'management.azure.com',
         port: 443,
