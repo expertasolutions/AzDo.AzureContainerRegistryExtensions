@@ -147,23 +147,24 @@ async function run() {
       let rawKubeConfig = JSON.parse(httpResponse as string).properties.kubeConfig;
       let base64KubeConfig = Buffer.from(rawKubeConfig, 'base64');
       //let base64KubeConfig = Buffer.from(rawKubeConfig, 'base64');
-      //console.log("kubeConfig base64: " + base64KubeConfig.toString());
+      console.log("kubeConfig base64: " + base64KubeConfig.toString());
 
       let kubeConfig = base64KubeConfig.toString();
       let kubeConfigFile = path.join(userDir, "config");
       fs.writeFileSync(kubeConfigFile, kubeConfig);
       process.env["KUBECONFIG"] = kubeConfigFile;
-      tl.setVariable("imagePullSecretName", "patate", true);
-    
+      console.log("kubeConfig --> " + kubeConfigFile);
       try {
-      
         let kubectlCmd = tl.tool(kubectlPath);
         kubectlCmd.on("stout", output => {
           console.log(output);
         })
         kubectlCmd.arg("get");
-        //let cmdArgs = [ "-f", kubeConfigFile ];
-        //kubectlCmd.arg(cmdArgs);
+        // Namespace
+        kubectlCmd.arg([]);
+        // Command Configuration file
+        kubectlCmd.arg([]);
+        // args
         kubectlCmd.arg("pod");
         kubectlCmd.arg("-o json");
         kubectlCmd.on("errLine", line => {
@@ -183,6 +184,8 @@ async function run() {
         fs.unlinkSync(kubeConfigFile);
       }
       throw new Error("AKS Secret access mode not implemented yet");
+
+      tl.setVariable("imagePullSecretName", "patate", true);
 
     } else {
       console.log("RBAC Access mode");
