@@ -153,7 +153,6 @@ async function run() {
       let kubeConfigFile = path.join(userDir, "config");
       fs.writeFileSync(kubeConfigFile, kubeConfig);
       process.env["KUBECONFIG"] = kubeConfigFile;
-      console.log("kubeConfig --> " + kubeConfigFile);
       try {
         let kubectlCmd = tl.tool(kubectlPath);
         kubectlCmd.on("stout", output => {
@@ -170,11 +169,14 @@ async function run() {
         kubectlCmd.on("errLine", line => {
           console.log(line);
         });
-        let cmdResult = kubectlCmd.exec()
+
+        let cmdResult = await kubectlCmd.exec()
                                   .fail(error => {
                                     console.log("fail");
                                     throw error;
                                   });
+        console.log("Result: " + cmdResult);
+        
       } catch {
         console.log("global error from kubectlCmd");
       }
