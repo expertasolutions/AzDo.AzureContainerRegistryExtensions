@@ -14,24 +14,26 @@ async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:strin
     return await msRestNodeAuth.loginWithServicePrincipalSecret(servicePrincipalId, servicePrincipalKey, tenantId );
 };
 
-function httpsGetRequest(httpsOptions:any, data:any) {
+function httpsGetRequest(httpsOptions:any) {
   return new Promise((resolve, reject) => {
-    const req = https.request(httpsOptions, res => {
-      let responseBody = "";
+    const req = https.request(httpsOptions, (response) => {
+      let data:any[] = [];
     
-      res.on('data', d => {
-        responseBody += d;
+      response.on('data', d => {
+        data.push(d);
       });
 
-      res.on('end', () => {
-        resolve(JSON.parse(responseBody));
-      })
+      response.on('end', () => {
+        let response_body = Buffer.concat(data);
+        resolve(response_body.toString());
+      });
+
+      response.on('error', err => {
+        reject(err);
+      });
     });
 
-    req.on('error', err => {
-      reject(err);
-    });
-    req.write(data);
+    
     req.end();
   });  
 }
@@ -150,7 +152,9 @@ async function run() {
       };
 
       let test = "";
-      await httpsGetRequest(getOptions, test);
+      httpsGetRequest(getOptions).then(response => {
+        console.log("Response: " + response);
+      });
       console.log("OutData: " + test);
       
       let oauthToken = "";
