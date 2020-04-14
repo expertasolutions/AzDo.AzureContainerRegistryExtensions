@@ -14,6 +14,28 @@ async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:strin
     return await msRestNodeAuth.loginWithServicePrincipalSecret(servicePrincipalId, servicePrincipalKey, tenantId );
 };
 
+function httpsGetRequest(httpsOptions:any, data:any) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(httpsOptions, res => {
+      let responseBody = "";
+    
+      res.on('data', d => {
+        responseBody += d;
+      });
+
+      res.on('end', () => {
+        resolve(JSON.parse(responseBody));
+      })
+    });
+
+    req.on('error', err => {
+      reject(err);
+    });
+    req.write(data);
+    req.end();
+  });  
+}
+
 async function run() {
   try { 
     let acrSubscriptionEndpoint = tl.getInput("acrSubscriptionEndpoint", true) as string;
@@ -127,19 +149,9 @@ async function run() {
         }
       };
 
-      const req = https.request(getOptions, res => {
-        console.log("statusCode: " + res.statusCode);
-        res.on('data', d => {
-          //process.stdout.write(d);
-          console.log("Data: " + d);
-        });
-      });
-
-      req.on('error', error => {
-        console.error(error);
-      });
-
-      req.end();
+      let test = "";
+      await httpsGetRequest(getOptions, test);
+      console.log("OutData: " + test);
       
       let oauthToken = "";
       let authHeader = "Authorization: Bearer " + oauthToken;
