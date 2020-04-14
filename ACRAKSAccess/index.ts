@@ -16,8 +16,10 @@ async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:strin
 
 async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line:string, kubectlPath:string) {
   let kubectlCmd = tl.tool(kubectlPath);
+  let outputResult = "";
   kubectlCmd.on("stout", output => {
     console.log(output);
+    outputResult = output;
   });
 
   kubectlCmd.arg(cmd);
@@ -25,12 +27,14 @@ async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line
   kubectlCmd.arg(configFile);
   kubectlCmd.line(type)
   kubectlCmd.line(line);
+  kubectlCmd.line("-o json");
 
-  return await kubectlCmd.exec()
+  let cmdResult = await kubectlCmd.exec()
                         .fail(error => {
                           console.log("fail");
                           throw error;
                         });
+  return outputResult;
 }
 
 function httpsGetRequest(httpsOptions:any) {
@@ -184,8 +188,8 @@ async function run() {
         
         let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry testlouis --docker-server=patate --docker-username=test --docker-password=test", kubectlPath);
         console.log("Create Secret Result: " + cmdCreateSecret);
-        
-        let cmdResult = await kubectl("get", [], [], "pod","-o json", kubectlPath);
+
+        let cmdResult = await kubectl("get", [], [], "pod","", kubectlPath);
         console.log("Get Pod Result: " + cmdResult);
         /*
         kubectlCmd.arg("get");
