@@ -113,7 +113,8 @@ async function run() {
       console.log("aksCreds.tokenCache._entries.accessToken: " + bearerToken);
       console.log("aksCreds.secret: " + aksCreds.secret);
 
-      let apiPath = "/subscriptions/" + aksSubcriptionId + "/resourceGroups/" + aksResourceGroup + "/providers/Microsoft.ContainerService/managedClusters/" + aksCluster + "/accessProfiles/clusterUser?api-version=2020-02-01";
+      let apiVersion = "2020-02-01"
+      let apiPath = "/subscriptions/" + aksSubcriptionId + "/resourceGroups/" + aksResourceGroup + "/providers/Microsoft.ContainerService/managedClusters/" + aksCluster + "/accessProfiles/clusterUser?api-version=" + apiVersion;
       console.log("apiPath: " + apiPath);
 
       let getOptions = {
@@ -141,10 +142,7 @@ async function run() {
       let authHeader = "Authorization: Bearer " + oauthToken;
       let contentType = "application/json";
 
-      // https://management.azure.com/subscriptions/c613aec0-2955-4f3a-8682-c9fc4aa4a998/resourceGroups/Experta_Production/providers/Microsoft.ContainerService/managedClusters/aksexpertaprod1167/accessProfiles/clusterUser?api-version=2017-08-31
-      // or
-      // https://management.azure.com/subscriptions/c613aec0-2955-4f3a-8682-c9fc4aa4a998/resourceGroups/Experta_Production/providers/Microsoft.ContainerService/managedClusters/aksexpertaprod1167/accessProfiles/clusterUser?api-version=2020-02-01
-      // https://management.azure.com/subscriptions/c613aec0-2955-4f3a-8682-c9fc4aa4a998/resourceGroups/Experta_Production/providers/Microsoft.ContainerService/managedClusters/aksexpertaprod1167/accessProfiles/clusterUser/listCredential?api-version=2020-02-01
+      // accessProfiles/clusterUser?api-version=2017-08-31
 
       console.log("kubeConfig: " + aksInfoResult.properties.kubeConfig);
       let base64KubeConfig = Buffer.from(aksInfoResult.properties.kubeConfig, 'base64');
