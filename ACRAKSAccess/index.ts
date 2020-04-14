@@ -180,8 +180,9 @@ async function run() {
       }
 
       if(kubeConfigFile != null && fs.existsSync(kubeConfigFile)) {
-        delete process.env["KUBECONFIG"];
-        fs.unlinkSync(kubeConfigFile);
+        console.log("Delete kubeConfigFile");
+        //delete process.env["KUBECONFIG"];
+        //fs.unlinkSync(kubeConfigFile);
       }
       throw new Error("AKS Secret access mode not implemented yet");
 
