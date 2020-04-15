@@ -16,13 +16,6 @@ async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:strin
 
 async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line:string, kubectlPath:string) {
   let kubectlCmd = tl.tool(kubectlPath);
-  //let outputResult = "";
-  /*
-  kubectlCmd.on("stout", output => {
-    //console.log(output);
-    outputResult = output;
-  });
-  */
 
   kubectlCmd.arg(cmd);
   kubectlCmd.arg(namespace);
@@ -35,7 +28,7 @@ async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line
   }
 
   kubectlCmd.on("stout", output => {
-
+    console.log("stdout called");
   });
 
   let outputResult = JSON.parse(kubectlCmd.execSync().stdout);
