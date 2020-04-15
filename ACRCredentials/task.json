@@ -12,7 +12,7 @@
         "Minor": 0,
         "Patch": 0
     },
-    "instanceNameFormat": "Show/Renew Azure Container Registries",
+    "instanceNameFormat": "$(actionType) Azure Container Registries",
     "groups": [],
     "inputs": [
         {
