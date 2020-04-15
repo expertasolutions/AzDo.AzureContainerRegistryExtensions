@@ -16,11 +16,13 @@ async function LoginToAzure(servicePrincipalId:string, servicePrincipalKey:strin
 
 async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line:string, kubectlPath:string) {
   let kubectlCmd = tl.tool(kubectlPath);
-  let outputResult = "";
+  //let outputResult = "";
+  /*
   kubectlCmd.on("stout", output => {
     //console.log(output);
     outputResult = output;
   });
+  */
 
   kubectlCmd.arg(cmd);
   kubectlCmd.arg(namespace);
@@ -29,11 +31,14 @@ async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line
   kubectlCmd.line(line);
   kubectlCmd.line("-o json");
 
+  let outputResult = kubectlCmd.execSync().stdout;
+  /*
   let cmdResult = await kubectlCmd.exec()
                         .fail(error => {
                           console.log("fail");
                           throw error;
                         });
+  */
   console.log("outputResult: " + outputResult);
   return outputResult;
 }
@@ -187,8 +192,8 @@ async function run() {
         
         // kubectl create secret docker-registry testlouis --docker-server=patate --docker-username=test --docker-password=test
         
-        let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry testlouis --docker-server=patate --docker-username=test --docker-password=test", kubectlPath);
-        console.log("Create Secret Result: " + cmdCreateSecret);
+        //let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry testlouis --docker-server=patate --docker-username=test --docker-password=test", kubectlPath);
+        //console.log("Create Secret Result: " + cmdCreateSecret);
 
         let cmdResult = await kubectl("get", [], [], "secret","", kubectlPath);
         console.log("Get Pod Result: " + cmdResult);
