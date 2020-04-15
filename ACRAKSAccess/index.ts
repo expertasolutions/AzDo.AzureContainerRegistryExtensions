@@ -33,12 +33,11 @@ async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line
 
   let outputResult = JSON.parse('{ "actionCompleted":"true"}');
   if(cmd === "delete") {
+    kubectlCmd.execSync();
+  } else {
     outputResult = JSON.parse(kubectlCmd.execSync().stdout);
     console.log("outputResult: " + outputResult);
-  } else {
-    kubectlCmd.execSync();
   }
-
   return outputResult;
 }
 
