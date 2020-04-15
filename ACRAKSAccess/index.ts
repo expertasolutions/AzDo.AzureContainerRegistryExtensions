@@ -185,7 +185,7 @@ async function run() {
         fs.writeFileSync(kubeConfigFile, kubeConfig);
         process.env["KUBECONFIG"] = kubeConfigFile;
 
-        let secretName = "testlouis";
+        let secretName = containerRegistry + ".secret";
         let dockerServer = containerRegistry;
         let dockerUsername = credsList.username;
         let dockerPassword = pwd1;
@@ -211,7 +211,6 @@ async function run() {
           }
         }
         tl.setVariable("imagePullSecretName", secretName, true);
-        // also add the secret namespace if specify
       }
     } else {
       console.log("RBAC Access mode");
