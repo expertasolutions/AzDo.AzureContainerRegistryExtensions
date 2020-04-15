@@ -29,7 +29,10 @@ async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line
   kubectlCmd.arg(configFile);
   kubectlCmd.line(type)
   kubectlCmd.line(line);
-  kubectlCmd.line("-o json");
+  
+  if(type !== "delete" ) {
+    kubectlCmd.line("-o json");
+  }
 
   kubectlCmd.on("stout", output => {
 
