@@ -190,7 +190,7 @@ async function run() {
       try {
 
         let cmdFindSecret = await kubectl("get", [], [], "secret","", kubectlPath);
-        if(cmdFindSecret.items.find(x=> x.metadata.name === secretName)) {
+        if(cmdFindSecret.items.find((elm:any) => elm.metadata.name === secretName)) {
           console.log("Secret: " + secretName + " is found");
           await kubectl("delete", [], [], "secret", secretName, kubectlPath);
         } else {
