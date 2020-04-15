@@ -31,14 +31,12 @@ async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line
   kubectlCmd.line(line);
   kubectlCmd.line("-o json");
 
-  let outputResult = kubectlCmd.execSync().stdout;
-  /*
-  let cmdResult = await kubectlCmd.exec()
-                        .fail(error => {
-                          console.log("fail");
-                          throw error;
-                        });
-  */
+  kubectlCmd.on("stout", output => {
+
+  });
+
+  let outputResult = JSON.parse(kubectlCmd.execSync().stdout);
+  
   console.log("outputResult: " + outputResult);
   return outputResult;
 }
@@ -144,6 +142,9 @@ async function run() {
     //----------------------------------------------------------------------------------------------------
 
     if(registerMode === "aksSecret") {
+
+      console.log("Kubernetes Secret Access mode");
+
       let kubectlPath = tl.which("kubectl", false);
       let kubectlVersion = await kubectlUtility.getStableKubectlVersion();
       let tmpDir = path.join(tl.getVariable('agent.tempDirectory') || os.tmpdir(), "kubectlTask");
@@ -175,65 +176,40 @@ async function run() {
       let httpResponse = await httpsGetRequest(getOptions);
       let rawKubeConfig = JSON.parse(httpResponse as string).properties.kubeConfig;
       let base64KubeConfig = Buffer.from(rawKubeConfig, 'base64');
-      //let base64KubeConfig = Buffer.from(rawKubeConfig, 'base64');
-      //console.log("kubeConfig base64: " + base64KubeConfig.toString());
 
       let kubeConfig = base64KubeConfig.toString();
       let kubeConfigFile = path.join(userDir, "config");
       fs.writeFileSync(kubeConfigFile, kubeConfig);
       process.env["KUBECONFIG"] = kubeConfigFile;
+
+      let secretName = "testLouis";
+      let dockerServer = "patate";
+      let dockerUsername = "test";
+      let dockerPassword = "pwd";
+
       try {
-        /*
-        let kubectlCmd = tl.tool(kubectlPath);
-        kubectlCmd.on("stout", output => {
-          console.log(output);
-        })
-        */
-        
-        // kubectl create secret docker-registry testlouis --docker-server=patate --docker-username=test --docker-password=test
-        
-        //let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry testlouis --docker-server=patate --docker-username=test --docker-password=test", kubectlPath);
+        let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry " + secretName + " --docker-server=" + dockerServer + " --docker-username=" + dockerUsername + " --docker-password=" + dockerPassword, kubectlPath);
         //console.log("Create Secret Result: " + cmdCreateSecret);
-
+        
         let cmdResult = await kubectl("get", [], [], "secret","", kubectlPath);
+        if(cmdResult.items !== undefined) {
+          console.log(cmdResult.items.length + " items founded");
+        }
         console.log("Get Pod Result: " + cmdResult);
-        /*
-        kubectlCmd.arg("get");
-        // Namespace
-        kubectlCmd.arg([]);
-        // Command Configuration file
-        kubectlCmd.arg([]);
-        // args
-        kubectlCmd.line("pod");
-        kubectlCmd.line("-o json");
-        kubectlCmd.on("errLine", line => {
-          console.log(line);
-        });
-
-        let cmdResult = await kubectlCmd.exec()
-                                  .fail(error => {
-                                    console.log("fail");
-                                    throw error;
-                                  });
-        */
-
       } catch {
         console.log("global error from kubectlCmd");
       }
 
       if(kubeConfigFile != null && fs.existsSync(kubeConfigFile)) {
-        console.log("Delete kubeConfigFile");
-        //delete process.env["KUBECONFIG"];
-        //fs.unlinkSync(kubeConfigFile);
+        delete process.env["KUBECONFIG"];
+        fs.unlinkSync(kubeConfigFile);
       }
       throw new Error("AKS Secret access mode not implemented yet");
 
-      tl.setVariable("imagePullSecretName", "patate", true);
+      tl.setVariable("imagePullSecretName", secretName, true);
 
     } else {
       console.log("RBAC Access mode");
-      
-      
       // Get the Azure Container Registry Resource infos
       let acrCreds:any = await LoginToAzure(acrServicePrincipalId, acrServicePrincipalKey, acrTenantId);
       let acrResourceClient = new resourceManagement.ResourceManagementClient(acrCreds, acrSubcriptionId);
