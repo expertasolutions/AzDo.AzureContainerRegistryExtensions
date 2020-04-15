@@ -142,15 +142,13 @@ async function run() {
     //----------------------------------------------------------------------------------------------------
 
     if(registerMode === "aksSecret") {
-
       console.log("Kubernetes Secret Access mode");
-
-      const manager = new msACR.ContainerRegistryManagementClient(aksCreds, aksTenantId);
+      const acrCredentials = await LoginToAzure(acrServicePrincipalId, acrServicePrincipalKey, acrTenantId);
+      const manager = new msACR.ContainerRegistryManagementClient(acrCredentials, acrSubcriptionId);
       let getResult = await manager.registries.get(acrResourceGroup, containerRegistry);
       if(getResult.adminUserEnabled === false){
         tl.setResult(tl.TaskResult.Failed, "Container registry named " + containerRegistry + " does not have adminUser configured");
       } else {
-        console.log("ACR is ok");
 
         let kubectlPath = tl.which("kubectl", false);
         let kubectlVersion = await kubectlUtility.getStableKubectlVersion();
