@@ -64,10 +64,6 @@ function httpsGetRequest(httpsOptions:any) {
   });  
 }
 
-function delay(ms: number) {
-    return new Promise( resolve => setTimeout(resolve, ms) );
-}
-
 async function run() {
   try { 
     let acrSubscriptionEndpoint = tl.getInput("acrSubscriptionEndpoint", true) as string;
@@ -196,7 +192,6 @@ async function run() {
         if(cmdFindSecret.items.find((elm:any) => elm.metadata.name === secretName)) {
           console.log("Secret: " + secretName + " is found");
           await kubectl("delete", [], [], "secret", secretName, kubectlPath);
-          await delay(5000);
         } else {
           console.log("Secret " + secretName + " isn't found");
         }
