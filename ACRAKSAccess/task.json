@@ -100,24 +100,6 @@
             "EditableOptions":true
           },
           "groupName": "aksGroup"
-        },
-        {
-          "name": "acrUsername",
-          "label": "Azure Container Registry username",
-          "type": "string",
-          "defaultValue": "",
-          "helpMarkDown" :"",
-          "visibleRule": "registerMode = aksSecret",
-          "groupName": "acrGroup"
-        },
-        {
-          "name": "acrPasswordToken",
-          "label": "Azure Container Registry Password Token",
-          "type": "string",
-          "defaultValue": "",
-          "helpMarkDown" :"",
-          "visibleRule": "registerMode = aksSecret",
-          "groupName": "acrGroup"
         }
     ],
     "dataSourceBindings" : [

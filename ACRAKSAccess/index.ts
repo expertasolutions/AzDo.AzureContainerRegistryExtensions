@@ -84,8 +84,6 @@ async function run() {
     let containerRegistry = tl.getInput("containerRegistry", true) as string;
     let aksResourceGroup = tl.getInput("aksResourceGroupName", true) as string;
     let aksCluster = tl.getInput("aksCluster", true) as string;
-    let acrUsername = tl.getInput("acrUsername", false) as string;
-    let acrPassword = tl.getInput("acrPassword", false) as string;
 
     /* ACR Subscription Informations */
     console.log("ACR Azure Subscription Id: " + acrSubcriptionId);
@@ -108,11 +106,6 @@ async function run() {
     console.log("Container Registry: " + containerRegistry);
     console.log("AKS Resource Group: " + aksResourceGroup);
     console.log("AKS Cluster: " + aksCluster);
-
-    if(acrUsername != undefined) {
-      console.log("ACR Username: " + acrUsername);
-      console.log("ACR Password: " + acrPassword);
-    }
 
     //----------------------------------------------------------------------------------------------------
     console.log("Looking for Azure Kubernetes service cluster ...");
@@ -146,9 +139,14 @@ async function run() {
       const acrCredentials = await LoginToAzure(acrServicePrincipalId, acrServicePrincipalKey, acrTenantId);
       const manager = new msACR.ContainerRegistryManagementClient(acrCredentials, acrSubcriptionId);
       let getResult = await manager.registries.get(acrResourceGroup, containerRegistry);
+
       if(getResult.adminUserEnabled === false){
         tl.setResult(tl.TaskResult.Failed, "Container registry named " + containerRegistry + " does not have adminUser configured");
       } else {
+
+        let credsList:any = await manager.registries.listCredentials(acrResourceGroup, containerRegistry);
+        var pwd1 = credsList.passwords[0].value;
+        var pwd2 = credsList.passwords[1].value;
 
         let kubectlPath = tl.which("kubectl", false);
         let kubectlVersion = await kubectlUtility.getStableKubectlVersion();
@@ -188,9 +186,9 @@ async function run() {
         process.env["KUBECONFIG"] = kubeConfigFile;
 
         let secretName = "testlouis";
-        let dockerServer = "patate";
-        let dockerUsername = "test";
-        let dockerPassword = "pwd";
+        let dockerServer = containerRegistry;
+        let dockerUsername = credsList.username;
+        let dockerPassword = pwd1;
 
         try {
           let cmdFindSecret = await kubectl("get", [], [], "secret","", kubectlPath);
@@ -212,8 +210,8 @@ async function run() {
             fs.unlinkSync(kubeConfigFile);
           }
         }
-        throw new Error("AKS Secret access mode not implemented yet");
         tl.setVariable("imagePullSecretName", secretName, true);
+        // also add the secret namespace if specify
       }
     } else {
       console.log("RBAC Access mode");
