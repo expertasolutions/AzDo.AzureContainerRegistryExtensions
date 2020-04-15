@@ -61,6 +61,10 @@ function httpsGetRequest(httpsOptions:any) {
   });  
 }
 
+function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
 async function run() {
   try { 
     let acrSubscriptionEndpoint = tl.getInput("acrSubscriptionEndpoint", true) as string;
@@ -192,6 +196,8 @@ async function run() {
         } else {
           console.log("Secret " + secretName + " isn't found");
         }
+          
+        await delay(3000);
 
         let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry " + secretName + " --docker-server=" + dockerServer + " --docker-username=" + dockerUsername + " --docker-password=" + dockerPassword, kubectlPath);
         console.log("Create Secret Result: " + cmdCreateSecret);
