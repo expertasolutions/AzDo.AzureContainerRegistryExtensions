@@ -58,7 +58,6 @@ function httpsGetRequest(httpsOptions:any) {
         reject(err);
       });
     });
-
     
     req.end();
   });  
