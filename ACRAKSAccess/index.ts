@@ -31,9 +31,12 @@ async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line
     console.log("stdout called");
   });
 
-  let outputResult = JSON.parse(kubectlCmd.execSync().stdout);
-  
-  console.log("outputResult: " + outputResult);
+  let outputResult = "";
+  if(cmd !== "delete") {
+    outputResult = JSON.parse(kubectlCmd.execSync().stdout);
+    console.log("outputResult: " + outputResult);
+  }
+
   return outputResult;
 }
 
@@ -193,12 +196,11 @@ async function run() {
         if(cmdFindSecret.items.find((elm:any) => elm.metadata.name === secretName)) {
           console.log("Secret: " + secretName + " is found");
           await kubectl("delete", [], [], "secret", secretName, kubectlPath);
+          await delay(5000);
         } else {
           console.log("Secret " + secretName + " isn't found");
         }
           
-        await delay(3000);
-
         let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry " + secretName + " --docker-server=" + dockerServer + " --docker-username=" + dockerUsername + " --docker-password=" + dockerPassword, kubectlPath);
         console.log("Create Secret Result: " + cmdCreateSecret);
         console.log("Secret " + secretName + " has been created!");
