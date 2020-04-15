@@ -1,6 +1,7 @@
 import * as tl from 'azure-pipelines-task-lib';
 import * as msRest from '@azure/ms-rest-js';
 import * as msRestNodeAuth from '@azure/ms-rest-nodeauth';
+import * as msACR from '@azure/arm-containerregistry';
 import * as resourceManagement from '@azure/arm-resources';
 import * as auth from '@azure/arm-authorization';
 import * as graph from '@azure/graph';
@@ -144,75 +145,78 @@ async function run() {
 
       console.log("Kubernetes Secret Access mode");
 
-      let kubectlPath = tl.which("kubectl", false);
-      let kubectlVersion = await kubectlUtility.getStableKubectlVersion();
-      let tmpDir = path.join(tl.getVariable('agent.tempDirectory') || os.tmpdir(), "kubectlTask");
-      if(!fs.existsSync(tmpDir)){
-        fs.mkdirSync(tmpDir);
-      }
-      let userDir = path.join(tmpDir, new Date().getTime().toString());
-      if(!fs.existsSync(userDir)){
-        fs.mkdirSync(userDir);
-      }
+      const manager = new msACR.ContainerRegistryManagementClient(aksCreds, aksTenantId);
+      let getResult = await manager.registries.get(acrResourceGroup, containerRegistry);
+      if(getResult.adminUserEnabled === false){
+        tl.setResult(tl.TaskResult.Failed, "Container registry named " + containerRegistry + " does not have adminUser configured");
+      } else {
+        console.log("ACR is ok");
 
-      let kubectlDownload = await kubectlUtility.downloadKubectl(kubectlVersion);
-      kubectlPath = kubectlDownload;
-      
-      let bearerToken = aksCreds.tokenCache._entries[0].accessToken;
-
-      let apiVersion = "2020-02-01"
-      let apiPath = "/subscriptions/" + aksSubcriptionId + "/resourceGroups/" + aksResourceGroup + "/providers/Microsoft.ContainerService/managedClusters/" + aksCluster + "/accessProfiles/clusterUser?api-version=" + apiVersion;
-      let getOptions = {
-        hostname: 'management.azure.com',
-        port: 443,
-        path: apiPath,
-        method: 'GET',
-        headers: {
-          Authorization: ' Bearer ' + bearerToken
+        let kubectlPath = tl.which("kubectl", false);
+        let kubectlVersion = await kubectlUtility.getStableKubectlVersion();
+        let tmpDir = path.join(tl.getVariable('agent.tempDirectory') || os.tmpdir(), "kubectlTask");
+        if(!fs.existsSync(tmpDir)){
+          fs.mkdirSync(tmpDir);
         }
-      };
-
-      let httpResponse = await httpsGetRequest(getOptions);
-      let rawKubeConfig = JSON.parse(httpResponse as string).properties.kubeConfig;
-      let base64KubeConfig = Buffer.from(rawKubeConfig, 'base64');
-
-      let kubeConfig = base64KubeConfig.toString();
-      let kubeConfigFile = path.join(userDir, "config");
-      fs.writeFileSync(kubeConfigFile, kubeConfig);
-      process.env["KUBECONFIG"] = kubeConfigFile;
-
-      let secretName = "testlouis";
-      let dockerServer = "patate";
-      let dockerUsername = "test";
-      let dockerPassword = "pwd";
-
-      try {
-
-        let cmdFindSecret = await kubectl("get", [], [], "secret","", kubectlPath);
-        if(cmdFindSecret.items.find((elm:any) => elm.metadata.name === secretName)) {
-          console.log("Secret: " + secretName + " is found");
-          await kubectl("delete", [], [], "secret", secretName, kubectlPath);
-        } else {
-          console.log("Secret " + secretName + " isn't found");
+        let userDir = path.join(tmpDir, new Date().getTime().toString());
+        if(!fs.existsSync(userDir)){
+          fs.mkdirSync(userDir);
         }
-          
-        let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry " + secretName + " --docker-server=" + dockerServer + " --docker-username=" + dockerUsername + " --docker-password=" + dockerPassword, kubectlPath);
-        console.log("Create Secret Result: " + cmdCreateSecret);
-        console.log("Secret " + secretName + " has been created!");
 
-      } catch {
-        throw new Error("global error from kubectlCmd");
-      } finally {
-        if(kubeConfigFile != null && fs.existsSync(kubeConfigFile)) {
-          delete process.env["KUBECONFIG"];
-          fs.unlinkSync(kubeConfigFile);
+        let kubectlDownload = await kubectlUtility.downloadKubectl(kubectlVersion);
+        kubectlPath = kubectlDownload;
+        
+        let bearerToken = aksCreds.tokenCache._entries[0].accessToken;
+
+        let apiVersion = "2020-02-01"
+        let apiPath = "/subscriptions/" + aksSubcriptionId + "/resourceGroups/" + aksResourceGroup + "/providers/Microsoft.ContainerService/managedClusters/" + aksCluster + "/accessProfiles/clusterUser?api-version=" + apiVersion;
+        let getOptions = {
+          hostname: 'management.azure.com',
+          port: 443,
+          path: apiPath,
+          method: 'GET',
+          headers: {
+            Authorization: ' Bearer ' + bearerToken
+          }
+        };
+
+        let httpResponse = await httpsGetRequest(getOptions);
+        let rawKubeConfig = JSON.parse(httpResponse as string).properties.kubeConfig;
+        let base64KubeConfig = Buffer.from(rawKubeConfig, 'base64');
+
+        let kubeConfig = base64KubeConfig.toString();
+        let kubeConfigFile = path.join(userDir, "config");
+        fs.writeFileSync(kubeConfigFile, kubeConfig);
+        process.env["KUBECONFIG"] = kubeConfigFile;
+
+        let secretName = "testlouis";
+        let dockerServer = "patate";
+        let dockerUsername = "test";
+        let dockerPassword = "pwd";
+
+        try {
+          let cmdFindSecret = await kubectl("get", [], [], "secret","", kubectlPath);
+          if(cmdFindSecret.items.find((elm:any) => elm.metadata.name === secretName)) {
+            console.log("Secret: " + secretName + " is found");
+            await kubectl("delete", [], [], "secret", secretName, kubectlPath);
+          } else {
+            console.log("Secret " + secretName + " isn't found");
+          }
+            
+          let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry " + secretName + " --docker-server=" + dockerServer + " --docker-username=" + dockerUsername + " --docker-password=" + dockerPassword, kubectlPath);
+          console.log("Create Secret Result: " + cmdCreateSecret);
+          console.log("Secret " + secretName + " has been created!");
+        } catch {
+          throw new Error("global error from kubectlCmd");
+        } finally {
+          if(kubeConfigFile != null && fs.existsSync(kubeConfigFile)) {
+            delete process.env["KUBECONFIG"];
+            fs.unlinkSync(kubeConfigFile);
+          }
         }
+        throw new Error("AKS Secret access mode not implemented yet");
+        tl.setVariable("imagePullSecretName", secretName, true);
       }
-      
-      throw new Error("AKS Secret access mode not implemented yet");
-
-      tl.setVariable("imagePullSecretName", secretName, true);
-
     } else {
       console.log("RBAC Access mode");
       // Get the Azure Container Registry Resource infos
