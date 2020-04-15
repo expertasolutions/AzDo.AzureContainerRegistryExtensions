@@ -182,28 +182,34 @@ async function run() {
       fs.writeFileSync(kubeConfigFile, kubeConfig);
       process.env["KUBECONFIG"] = kubeConfigFile;
 
-      let secretName = "testLouis";
+      let secretName = "testlouis";
       let dockerServer = "patate";
       let dockerUsername = "test";
       let dockerPassword = "pwd";
 
       try {
-        let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry " + secretName + " --docker-server=" + dockerServer + " --docker-username=" + dockerUsername + " --docker-password=" + dockerPassword, kubectlPath);
-        //console.log("Create Secret Result: " + cmdCreateSecret);
-        
-        let cmdResult = await kubectl("get", [], [], "secret","", kubectlPath);
-        if(cmdResult.items !== undefined) {
-          console.log(cmdResult.items.length + " items founded");
-        }
-        console.log("Get Pod Result: " + cmdResult);
-      } catch {
-        console.log("global error from kubectlCmd");
-      }
 
-      if(kubeConfigFile != null && fs.existsSync(kubeConfigFile)) {
-        delete process.env["KUBECONFIG"];
-        fs.unlinkSync(kubeConfigFile);
+        let cmdFindSecret = await kubectl("get", [], [], "secret","", kubectlPath);
+        if(cmdFindSecret.items.find(x=> x.metadata.name === secretName)) {
+          console.log("Secret: " + secretName + " is found");
+          await kubectl("delete", [], [], "secret", secretName, kubectlPath);
+        } else {
+          console.log("Secret " + secretName + " isn't found");
+        }
+
+        let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry " + secretName + " --docker-server=" + dockerServer + " --docker-username=" + dockerUsername + " --docker-password=" + dockerPassword, kubectlPath);
+        console.log("Create Secret Result: " + cmdCreateSecret);
+        console.log("Secret " + secretName + " has been created!");
+
+      } catch {
+        throw new Error("global error from kubectlCmd");
+      } finally {
+        if(kubeConfigFile != null && fs.existsSync(kubeConfigFile)) {
+          delete process.env["KUBECONFIG"];
+          fs.unlinkSync(kubeConfigFile);
+        }
       }
+      
       throw new Error("AKS Secret access mode not implemented yet");
 
       tl.setVariable("imagePullSecretName", secretName, true);
