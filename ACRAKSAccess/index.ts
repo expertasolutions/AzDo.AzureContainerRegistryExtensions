@@ -37,7 +37,6 @@ async function kubectl(cmd:string, namespace:[], configFile:[],type:string, line
     kubectlCmd.execSync();
   } else {
     outputResult = JSON.parse(kubectlCmd.execSync().stdout);
-    console.log("outputResult: " + outputResult);
   }
   return outputResult;
 }
@@ -199,8 +198,7 @@ async function run() {
             console.log("Secret " + secretName + " isn't found");
           }
             
-          let cmdCreateSecret = await kubectl("create", [], [], "secret","docker-registry " + secretName + " --docker-server=" + dockerServer + " --docker-username=" + dockerUsername + " --docker-password=" + dockerPassword, kubectlPath);
-          console.log("Create Secret Result: " + cmdCreateSecret);
+          await kubectl("create", [], [], "secret","docker-registry " + secretName + " --docker-server=" + dockerServer + " --docker-username=" + dockerUsername + " --docker-password=" + dockerPassword, kubectlPath);
           console.log("Secret " + secretName + " has been created!");
         } catch {
           throw new Error("global error from kubectlCmd");
