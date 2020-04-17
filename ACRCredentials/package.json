@@ -1,5 +1,5 @@
 {
-  "name": "ACRCredentials",
+  "name": "acrcredentials",
   "version": "1.0.0",
   "description": "Task to extract version number digit from a string",
   "main": "index.js",

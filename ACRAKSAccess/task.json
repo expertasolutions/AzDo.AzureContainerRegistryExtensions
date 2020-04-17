@@ -4,7 +4,7 @@
     "friendlyName": "ACRAKS Access",
     "description": "Set ACR Access to Kubernetes cluster",
     "helpMarkDown": "",
-    "preview": true,
+    "preview": false,
     "category": "Utility",
     "author": "Solutions Experta Inc.",
     "version": {
@@ -100,24 +100,6 @@
             "EditableOptions":true
           },
           "groupName": "aksGroup"
-        },
-        {
-          "name": "acrUsername",
-          "label": "Azure Container Registry username",
-          "type": "string",
-          "defaultValue": "",
-          "helpMarkDown" :"",
-          "visibleRule": "registerMode = aksSecret",
-          "groupName": "acrGroup"
-        },
-        {
-          "name": "acrPasswordToken",
-          "label": "Azure Container Registry Password Token",
-          "type": "string",
-          "defaultValue": "",
-          "helpMarkDown" :"",
-          "visibleRule": "registerMode = aksSecret",
-          "groupName": "acrGroup"
         }
     ],
     "dataSourceBindings" : [
@@ -150,7 +132,9 @@
         "resultTemplate": "{{{name}}}"
       }
     ],
-    "outputVariables" : [],
+    "outputVariables" : [
+      { "name": "imagePullSecretName" }
+    ],
     "execution": {
         "Node": {
           "target": "index.js",
